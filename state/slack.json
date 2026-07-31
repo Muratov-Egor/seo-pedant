@@ -1,0 +1,13 @@
+{
+  "_comment": [
+    "Состояние доставки, его ведёт агент (см. prompts/manual-run.md).",
+    "thread_ts — метка последнего отправленного отчёта: следующий прогон читает",
+    "по ней ответы владельца в треде и учитывает их."
+  ],
+  "last_run": "2026-07-31",
+  "channel_id": "C08664V7RUH",
+  "thread_ts": "1785508861.823689",
+  "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1785508861823689",
+  "sent_as": "пользователь через Slack MCP (Slack App с bot-токеном пока не создан)",
+  "feedback_checked": false
+}
