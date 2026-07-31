@@ -3,7 +3,10 @@
     "Пороги и настройки проверок по умолчанию для всех типов страниц.",
     "Файл <type>.json наследует этот и переопределяет: thresholds и severity_overrides",
     "мержатся по ключам, disabled конкатенируется.",
-    "Числа взяты из SEO Checklist; менять здесь, а не в коде проверок."
+    "Числа взяты из SEO Checklist; менять здесь, а не в коде проверок.",
+    "report_collapse_threshold — только про вид отчёта: группа однотипных находок",
+    "больше этого числа складывается в таблицу под раскрытием. На отпечатки и историю",
+    "не влияет."
   ],
   "thresholds": {
     "title_max_len": 70,
@@ -16,7 +19,7 @@
     "lighthouse_min_score": 90,
     "link_check_limit": 1000,
     "duplicate_text_pct": 30,
-    "report_collapse_threshold": 4
+    "report_collapse_threshold": 12
   },
   "checks": {
     "disabled": [],
