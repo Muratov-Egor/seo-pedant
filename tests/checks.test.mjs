@@ -45,17 +45,24 @@ function robotsSite(text, { sitemapFound = { [normUrl(URL)]: 'sitemap-1.xml' }, 
 
 const ROBOTS_OK = 'User-agent: *\nDisallow: /search\nSitemap: https://www.aviasales.ru/sitemap.xml';
 
+const NO_LIMITS = { own_domains: ['aviasales.ru'], development: { enabled: false, internal_links_per_page: null } };
+
+function linksArtifact(statuses, extra = {}) {
+  const count = Object.keys(statuses).length;
+  return { statuses, checked: count, total: count, skipped: [], scope: NO_LIMITS, ...extra };
+}
+
+/** Статусы на все http-ссылки страницы — как будто проверили и всё ответило одинаково. */
 function statusesFor(html, status = 200) {
-  const facts = factsFor(html);
   const statuses = {};
-  for (const link of facts.html.links) {
+  for (const link of factsFor(html).html.links) {
     if (link.kind === 'http' && link.hrefAbs) statuses[link.hrefAbs] = { status, error: null, method: 'HEAD' };
   }
-  return { statuses, checked: Object.keys(statuses).length, total: Object.keys(statuses).length, skipped: [] };
+  return linksArtifact(statuses);
 }
 
 test('реестр проверок согласован', () => {
-  assert.equal(ALL_CHECKS.length, 22);
+  assert.equal(ALL_CHECKS.length, 23);
   assert.equal(new Set(ALL_CHECKS.map((c) => c.id)).size, ALL_CHECKS.length);
   assert.ok(ALL_CHECKS.every((c) => ['page', 'site'].includes(c.scope)));
   assert.ok(ALL_CHECKS.every((c) => ['P1', 'P2', 'P3'].includes(c.severity)));
@@ -271,63 +278,128 @@ test('alt-tags: alt есть у всех картинок', () => {
   assert.equal(bad.findings.filter((f) => f.severity === 'P3').length, 2);
 });
 
-test('links: битые, nofollow внутри, отсутствие nofollow снаружи', () => {
-  const ok = verdictOf(check('links'), GOOD, { links: statusesFor(GOOD) });
-  assert.equal(ok.status, 'pass');
+test('внутренние и внешние ссылки — это две разные проверки', () => {
+  // Одна и та же страница судится дважды, с разной строгостью и разными адресами находок.
+  assert.equal(check('links-internal').checklist, 'Внутренние ссылки');
+  assert.equal(check('links-external').checklist, 'Внешние ссылки');
+  assert.equal(check('links-internal').severity, 'P1', 'битая ссылка на свой домен — наш баг');
+  assert.equal(check('links-external').severity, 'P2', 'битая ссылка на чужой сайт — не наш баг');
+});
 
-  const bad = verdictOf(check('links'), BAD, {
-    links: {
-      statuses: {
-        'https://www.aviasales.ru/countries/gruziya': { status: 200, error: null },
-        'https://example.com/partner': { status: 200, error: null },
-        'https://www.aviasales.ru/airlines/2s?language=ru': { status: 404, error: null },
-      },
-      checked: 3,
-      total: 3,
-      skipped: [],
-    },
+test('свои домены задаются конфигом, а не доменом страницы', () => {
+  const html =
+    '<html><body>' +
+    '<a href="https://www.aviasales.ge/countries/turtsiya">GE</a>' +
+    '<a href="https://www.aviasales.uz/countries/turtsiya">UZ</a>' +
+    '<a href="https://example.com/x">чужой</a>' +
+    '</body></html>';
+  const facts = factsFor(html, { ownDomains: ['aviasales.ru', 'aviasales.ge', 'aviasales.uz'] });
+  const internal = facts.html.links.filter((l) => l.internal).map((l) => l.site);
+  assert.deepEqual(internal, ['aviasales.ge', 'aviasales.uz']);
+  assert.deepEqual(
+    facts.html.links.filter((l) => l.external).map((l) => l.site),
+    ['example.com'],
+  );
+
+  // Убрали домен из конфига — ссылка на него становится внешней.
+  const narrow = factsFor(html, { ownDomains: ['aviasales.ru'] });
+  assert.equal(narrow.html.links.filter((l) => l.internal).length, 0);
+});
+
+test('links-internal: битые и nofollow на своих ссылках', () => {
+  const ok = verdictOf(check('links-internal'), GOOD, { links: statusesFor(GOOD) });
+  assert.equal(ok.status, 'pass');
+  assert.match(ok.note, /внутренних ссылок на странице 2, проверено 2/);
+
+  const bad = verdictOf(check('links-internal'), BAD, {
+    links: linksArtifact({
+      'https://www.aviasales.ru/countries/gruziya': { status: 200, error: null },
+      'https://www.aviasales.ru/airlines/2s?language=ru': { status: 404, error: null },
+    }),
   });
   assert.equal(bad.status, 'fail');
   const broken = bad.findings.find((f) => f.actual === 'HTTP 404');
-  assert.equal(effectiveSeverity(broken, check('links')), 'P1');
+  assert.equal(effectiveSeverity(broken, check('links-internal')), 'P1');
   assert.ok(bad.findings.some((f) => f.expected.includes('внутренняя ссылка без')));
-  assert.ok(bad.findings.some((f) => f.expected.includes('внешняя ссылка с')));
+  // Внешнюю ссылку эта проверка не трогает — ей занимается links-external.
+  assert.ok(!bad.findings.some((f) => f.entity.includes('example.com')));
+
+  // Одна ссылка нарушает сразу два требования: адреса находок обязаны различаться,
+  // иначе исчезновение одной перебьёт отпечаток другой и она попадёт в «устранено».
+  const twoProblems = verdictOf(
+    check('links-internal'),
+    '<html><body><a href="https://www.aviasales.ru/x" rel="nofollow">x</a></body></html>',
+    { links: linksArtifact({ 'https://www.aviasales.ru/x': { status: 404, error: null } }) },
+  );
+  assert.equal(twoProblems.findings.length, 2);
+  assert.equal(new Set(twoProblems.findings.map((f) => f.entity)).size, 2);
+});
+
+test('links-internal: лимит на время разработки не превращается в находки', () => {
+  const html =
+    '<html><body>' +
+    '<a href="https://www.aviasales.ru/a">a</a>' +
+    '<a href="https://www.aviasales.ru/b">b</a>' +
+    '<a href="https://www.aviasales.ru/c">c</a>' +
+    '</body></html>';
+
+  // Проверена только первая из трёх: остальные не пропущены молча, о лимите
+  // говорит примечание вердикта, а не находка на каждую ссылку.
+  const limited = verdictOf(check('links-internal'), html, {
+    links: linksArtifact(
+      { 'https://www.aviasales.ru/a': { status: 200, error: null } },
+      { scope: { own_domains: ['aviasales.ru'], development: { enabled: true, internal_links_per_page: 1 } } },
+    ),
+  });
+  assert.equal(limited.status, 'pass');
+  assert.match(limited.note, /проверено 1 — действует лимит 1 на страницу на время разработки/);
+  assert.equal(limited.findings.length, 0);
+  // «Пройдено на проверенной части» — отчёт покажет такой пункт как ✅*, а не ✅.
+  assert.equal(limited.partial, true);
+
+  // Без режима разработки та же недопроверка — уже находка: значит упёрлись в жёсткий лимит.
+  const unexpected = verdictOf(check('links-internal'), html, {
+    links: linksArtifact({ 'https://www.aviasales.ru/a': { status: 200, error: null } }),
+  });
+  assert.ok(unexpected.findings.some((f) => f.entity === 'непроверенные внутренние ссылки'));
+  assert.notEqual(unexpected.partial, true, 'без лимита частичность не заявляется');
+});
+
+test('links-external: nofollow обязателен, битые мягче внутренних', () => {
+  const ok = verdictOf(check('links-external'), GOOD, { links: statusesFor(GOOD) });
+  assert.equal(ok.status, 'pass');
+  assert.match(ok.note, /внешних ссылок на странице 1/);
+
+  const bad = verdictOf(check('links-external'), BAD, {
+    links: linksArtifact({ 'https://example.com/partner': { status: 200, error: null } }),
+  });
+  assert.equal(bad.status, 'fail');
+  assert.equal(bad.findings.length, 1);
+  assert.ok(bad.findings[0].entity.startsWith('нет nofollow: '));
+
+  const broken = verdictOf(
+    check('links-external'),
+    '<html><body><a href="https://example.com/x" rel="nofollow">x</a></body></html>',
+    { links: linksArtifact({ 'https://example.com/x': { status: 404, error: null } }) },
+  );
+  assert.equal(effectiveSeverity(broken.findings[0], check('links-external')), 'P2');
 
   // Антибот ответил отказом — это не битая ссылка, а невозможность проверить.
   // Такие ссылки идут одной находкой: это один факт о прогоне, а не сотни проблем.
   const refused = verdictOf(
-    check('links'),
+    check('links-external'),
     '<html><body><a href="https://vk.com/a" rel="nofollow">a</a><a href="https://vk.com/b" rel="nofollow">b</a></body></html>',
     {
-      links: {
-        statuses: {
-          'https://vk.com/a': { status: 418, error: null },
-          'https://vk.com/b': { status: 202, error: null },
-        },
-        checked: 2,
-        total: 2,
-        skipped: [],
-      },
+      links: linksArtifact({
+        'https://vk.com/a': { status: 418, error: null },
+        'https://vk.com/b': { status: 202, error: null },
+      }),
     },
   );
   assert.equal(refused.status, 'warn');
   assert.equal(refused.findings.length, 1);
-  assert.equal(refused.findings[0].entity, 'ссылки без ответа на проверку');
+  assert.equal(refused.findings[0].entity, 'внешние ссылки без ответа на проверку');
   assert.match(refused.findings[0].actual, /^2 ссылок/);
-  assert.equal(refused.findings[0].severity, 'P3');
-
-  const unchecked = verdictOf(check('links'), GOOD, {
-    links: { statuses: {}, checked: 0, total: 3, skipped: [] },
-  });
-  assert.ok(unchecked.findings.some((f) => f.entity === 'непроверенные ссылки'));
-
-  // Одна ссылка нарушает сразу два требования: адреса находок обязаны различаться,
-  // иначе исчезновение одной перебьёт отпечаток другой и она попадёт в «устранено».
-  const twoProblems = verdictOf(check('links'), '<html><body><a href="https://example.com/x">x</a></body></html>', {
-    links: { statuses: { 'https://example.com/x': { status: 404, error: null } }, checked: 1, total: 1, skipped: [] },
-  });
-  assert.equal(twoProblems.findings.length, 2);
-  assert.equal(new Set(twoProblems.findings.map((f) => f.entity)).size, 2);
 });
 
 test('structured-data: валидный ld+json с обязательными полями', () => {

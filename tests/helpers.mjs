@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { htmlFacts, urlFacts } from '../lib/facts.mjs';
 import { keywordsFor } from '../lib/keywords.mjs';
-import { configForType } from '../lib/config.mjs';
+import { configForType, scope } from '../lib/config.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_URL = 'https://www.aviasales.ru/countries/turtsiya';
@@ -18,6 +18,9 @@ export function fixture(name) {
 export function factsFor(html, options = {}) {
   const url = options.url ?? DEFAULT_URL;
   const finalUrl = options.finalUrl ?? url;
+  // По умолчанию берём наши домены из конфига — так тесты видят ту же картину
+  // внутренних и внешних ссылок, что и настоящий прогон.
+  const ownDomains = options.ownDomains ?? scope().own_domains;
   return {
     page: {
       slug: options.slug ?? 'countries-turtsiya',
@@ -37,8 +40,8 @@ export function factsFor(html, options = {}) {
     },
     url: urlFacts(url),
     finalUrl: urlFacts(finalUrl),
-    html: html == null ? null : htmlFacts(html, finalUrl),
-    dom: options.dom ? htmlFacts(options.dom, finalUrl) : null,
+    html: html == null ? null : htmlFacts(html, finalUrl, { ownDomains }),
+    dom: options.dom ? htmlFacts(options.dom, finalUrl, { ownDomains }) : null,
     console: options.console ?? null,
     mobile: options.mobile ?? null,
     lighthouse: options.lighthouse ?? null,
