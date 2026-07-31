@@ -44,6 +44,27 @@
       "type": "country",
       "label": "Беларусь",
       "enabled": true
+    },
+    {
+      "slug": "routes-mow-aer",
+      "url": "https://www.aviasales.ru/routes/mow/aer",
+      "type": "route",
+      "label": "Москва — Сочи",
+      "enabled": true
+    },
+    {
+      "slug": "cities-moskva-mow",
+      "url": "https://www.aviasales.ru/cities/moskva-mow",
+      "type": "city",
+      "label": "Москва",
+      "enabled": true
+    },
+    {
+      "slug": "airports-zhukovsky-international-airport-zia",
+      "url": "https://www.aviasales.uz/airports/zhukovsky-international-airport-zia",
+      "type": "airport",
+      "label": "Жуковский (ZIA)",
+      "enabled": true
     }
   ]
 }
