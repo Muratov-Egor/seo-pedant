@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { collapse, hasStem, normalize, similarityPct, wordCount, sentenceWith } from '../lib/text.mjs';
-import { keywordsFor, stem, translit } from '../lib/keywords.mjs';
+import { keywordsFor, nameTokens, stem, translit } from '../lib/keywords.mjs';
 import { groupFor, normUrl, parseRobots, robotsDecision } from '../lib/collect/site.mjs';
 import { botWallReason, htmlFacts, urlFacts } from '../lib/facts.mjs';
 import { fingerprint, judge, pass } from '../lib/verdict.mjs';
@@ -38,15 +38,62 @@ test('ключевые слова выводятся из слага обрат�
   assert.equal(stem('авиабилеты'), 'авиабилет');
 
   const kw = keywordsFor({ url: 'https://www.aviasales.ru/countries/turtsiya' });
-  assert.equal(kw.source, 'url');
+  assert.equal(kw.source, 'URL');
   assert.equal(kw.topic.stem, 'авиабилет');
   assert.equal(kw.entity.stem, 'турци');
 });
 
+test('одиночная y в транслите разбирается по соседям', () => {
+  // Три разных звука одной буквы: иначе аэропорт «Жуковский» превращается в «жуковскй»,
+  // а такого слова на странице нет — и проверка ключевых слов врёт.
+  assert.equal(translit('zhukovsky'), 'жуковский');
+  assert.equal(translit('krym'), 'крым');
+  assert.equal(translit('mytishchi'), 'мытищи');
+  assert.equal(translit('yalta'), 'ялта');
+  assert.equal(stem('жуковский'), 'жуковск');
+});
+
+test('в слаге отбрасываются IATA-коды и английские слова', () => {
+  // cities/moskva-mow — код приклеен к названию
+  assert.deepEqual(nameTokens('https://www.aviasales.ru/cities/moskva-mow'), ['moskva']);
+  // airports/... — к названию добавлены служебные английские слова
+  assert.deepEqual(
+    nameTokens('https://www.aviasales.uz/airports/zhukovsky-international-airport-zia'),
+    ['zhukovsky'],
+  );
+  // routes/mow/aer — названия в URL нет вообще, только коды
+  assert.deepEqual(nameTokens('https://www.aviasales.ru/routes/mow/aer'), []);
+  assert.deepEqual(nameTokens('https://www.aviasales.ru/countries/tailand'), ['tailand']);
+});
+
+test('ключевые слова выводятся для страниц разных типов', () => {
+  const city = keywordsFor({ url: 'https://www.aviasales.ru/cities/moskva-mow', label: 'Москва' });
+  assert.equal(city.source, 'URL');
+  assert.deepEqual(city.all.map((k) => k.stem), ['авиабилет', 'москв']);
+
+  const airport = keywordsFor({
+    url: 'https://www.aviasales.uz/airports/zhukovsky-international-airport-zia',
+    label: 'Жуковский (ZIA)',
+  });
+  assert.equal(airport.source, 'URL');
+  assert.deepEqual(airport.all.map((k) => k.stem), ['аэропорт', 'жуковск']);
+
+  // У маршрута в URL только коды, поэтому название берётся из label конфига.
+  const route = keywordsFor({ url: 'https://www.aviasales.ru/routes/mow/aer', label: 'Москва — Сочи' });
+  assert.equal(route.source, 'URL + label');
+  assert.deepEqual(route.all.map((k) => k.stem), ['авиабилет', 'москв', 'сочи']);
+
+  // Нет ни названия в URL, ни label — остаётся только тема, выдуманных слов не появляется.
+  const bare = keywordsFor({ url: 'https://www.aviasales.ru/routes/mow/aer' });
+  assert.equal(bare.entity, null);
+  assert.deepEqual(bare.all.map((k) => k.stem), ['авиабилет']);
+});
+
 test('ключевые слова из конфига перекрывают автовывод', () => {
-  const kw = keywordsFor({ url: 'https://www.aviasales.ru/x/y', keywords: ['Мальдивы'] });
-  assert.equal(kw.source, 'config');
+  const kw = keywordsFor({ url: 'https://www.aviasales.ru/x/y', keywords: ['Мальдивы'], label: 'что угодно' });
+  assert.equal(kw.source, 'конфиг');
   assert.equal(kw.all[0].stem, 'мальдив');
+  assert.equal(kw.all.length, 1);
 });
 
 test('robots.txt: группы, wildcard и приоритет длинного правила', () => {
