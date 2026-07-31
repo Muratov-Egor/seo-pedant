@@ -352,7 +352,7 @@ test('links-internal: лимит на время разработки не пр�
     ),
   });
   assert.equal(limited.status, 'pass');
-  assert.match(limited.note, /проверено 1 — действует лимит 1 на страницу на время разработки/);
+  assert.match(limited.note, /проверено 1 — лимит 1 на страницу на время разработки$/);
   assert.equal(limited.findings.length, 0);
   // «Пройдено на проверенной части» — отчёт покажет такой пункт как ✅*, а не ✅.
   assert.equal(limited.partial, true);
@@ -363,6 +363,19 @@ test('links-internal: лимит на время разработки не пр�
   });
   assert.ok(unexpected.findings.some((f) => f.entity === 'непроверенные внутренние ссылки'));
   assert.notEqual(unexpected.partial, true, 'без лимита частичность не заявляется');
+
+  // Ссылки, общие для нескольких страниц, проверяются один раз на прогон и достаются
+  // странице сверх её лимита. «Проверено больше лимита» — не ошибка, но требует оговорки.
+  const shared = verdictOf(check('links-internal'), html, {
+    links: linksArtifact(
+      {
+        'https://www.aviasales.ru/a': { status: 200, error: null },
+        'https://www.aviasales.ru/b': { status: 200, error: null },
+      },
+      { scope: { own_domains: ['aviasales.ru'], development: { enabled: true, internal_links_per_page: 1 } } },
+    ),
+  });
+  assert.match(shared.note, /проверено 2 — лимит 1 на страницу.*общие для страниц ссылки проверяются один раз/);
 });
 
 test('links-external: nofollow обязателен, битые мягче внутренних', () => {

@@ -1,0 +1,29 @@
+*SEO Pedant · прогон 2026-07-31-3*
+8 стр. · находок 203 (P1 2 · P2 141 · P3 60)
+🆕 новых 61 · ✅ устранено 1 · прошлый прогон 2026-07-31-2: 142
+
+⏳ _На время разработки внутренние ссылки проверяются частично: первые 10 на страницу. Внешние — все. Снять: development.enabled в config/scope.json._
+
+*Требует решения*
+• ↻ P1 Код ответа сервера: 1 — countries-tailand
+     напр. URL из конфига отдаёт 301 и ведёт на https://www.aviasales.ru/countries/tailand
+• 🆕 P1 Canonical указывает на саму страницу, без параметров: 1 — airports-zhukovsky-international-airport-zia
+     напр. адрес: ожидалось canonical на саму страницу (https://www.aviasales.uz/airports/zhukovsky-international-airport-zia), фактически https://www…
+• 🆕43 P2 Внешние ссылки: 123 — все страницы
+     напр. битая: https://www.facebook.com/aviasalesuz: ожидалось ссылка отдаёт 2xx или 3xx, фактически HTTP 400
+• 🆕6 P2 Наличие Open Graph / Twitter meta: 16 — все страницы
+     напр. og:image: ожидалось абсолютный URL картинки, фактически /og_images/default.png
+• 🆕 P2 Title страницы: 2 — cities-moskva-mow, routes-mow-aer
+     напр. длина: ожидалось не больше 70 символов, фактически 89
+
+*Не требует решения сейчас*
+• P3 Alt-теги у всех изображений: 29 (5 стр.)
+• P3 Нет ошибок в консоли: 26 (8 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+
+*Устранено*
+• ✅ countries-tailand: десктоп
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external)_
+
+Полный отчёт: https://github.com/Muratov-Egor/seo-pedant/blob/master/reports/2026-07-31-3.md
