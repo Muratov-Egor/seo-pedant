@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Пороги и настройки проверок по умолчанию для всех типов страниц.",
+    "Файл <type>.json наследует этот и переопределяет: thresholds и severity_overrides",
+    "мержатся по ключам, disabled конкатенируется.",
+    "Числа взяты из SEO Checklist; менять здесь, а не в коде проверок."
+  ],
+  "thresholds": {
+    "title_max_len": 70,
+    "title_keyword_head_ratio": 0.5,
+    "description_max_len": 160,
+    "alt_words_min": 2,
+    "alt_words_max": 5,
+    "min_text_chars": 500,
+    "ssr_text_ratio_min": 0.6,
+    "lighthouse_min_score": 90,
+    "link_check_limit": 1000,
+    "duplicate_text_pct": 30,
+    "report_collapse_threshold": 4
+  },
+  "checks": {
+    "disabled": [],
+    "severity_overrides": {}
+  }
+}

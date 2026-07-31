@@ -1,0 +1,24 @@
+{
+  "runId": "2026-07-31",
+  "checked_at": "2026-07-31T14:38:03.041Z",
+  "previous_run": null,
+  "totals": {
+    "pages": 5,
+    "blocked_pages": 0,
+    "verdicts": 110,
+    "pass": 79,
+    "fail": 11,
+    "warn": 15,
+    "skip": 0,
+    "na": 5,
+    "findings": 408,
+    "P1": 251,
+    "P2": 101,
+    "P3": 56,
+    "new": 408,
+    "repeat": 0,
+    "resolved": 0,
+    "unchecked_now": 0,
+    "suppressed": 0
+  }
+}

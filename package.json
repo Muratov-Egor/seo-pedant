@@ -1,0 +1,23 @@
+{
+  "name": "seo-pedant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Проверка страниц aviasales.ru по SEO Checklist с историей прогонов и отчётом в Slack",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "audit": "node lib/collect.mjs --all && node lib/check.mjs && node lib/report.mjs",
+    "audit:fast": "node lib/collect.mjs --all --static-only && node lib/check.mjs && node lib/report.mjs",
+    "collect": "node lib/collect.mjs",
+    "check": "node lib/check.mjs",
+    "report": "node lib/report.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "lighthouse": "^13.4.1",
+    "playwright": "^1.62.1"
+  }
+}

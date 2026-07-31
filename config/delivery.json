@@ -1,0 +1,14 @@
+{
+  "_comment": [
+    "Куда идёт короткий отчёт и как строится ссылка на полный.",
+    "repo и branch используются для ссылки вида <repo>/blob/<branch>/reports/<runId>.md —",
+    "она становится валидной только после git push отчёта.",
+    "Пока отправку делает агент через Slack MCP; когда появится Slack App,",
+    "сюда добавится bot_token_env с именем переменной окружения."
+  ],
+  "channel_id": "C08664V7RUH",
+  "workspace": "Aviasales",
+  "repo": "https://github.com/Muratov-Egor/seo-pedant",
+  "branch": "master",
+  "slack_max_chars": 3500
+}

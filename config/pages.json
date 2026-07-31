@@ -1,0 +1,49 @@
+{
+  "_comment": [
+    "Список проверяемых страниц. Правит владелец, бот только читает.",
+    "slug — имя папки в data/runs/<runId>/ И часть отпечатка находки.",
+    "Переименование слага обнуляет историю проблем по этой странице — не переименовывать.",
+    "url — ровно тот, что нужно проверять: если в списке URL без www, а сайт редиректит на www,",
+    "это не ошибка конфига, а находка проверки http-status.",
+    "type — какой файл из config/page-types/ задаёт пороги.",
+    "enabled: false — временно исключить из прогона.",
+    "keywords — необязательный список ожидаемых ключевых слов; если не задан, выводится из URL."
+  ],
+  "pages": [
+    {
+      "slug": "countries-tailand",
+      "url": "https://aviasales.ru/countries/tailand",
+      "type": "country",
+      "label": "Таиланд",
+      "enabled": true
+    },
+    {
+      "slug": "countries-turtsiya",
+      "url": "https://www.aviasales.ru/countries/turtsiya",
+      "type": "country",
+      "label": "Турция",
+      "enabled": true
+    },
+    {
+      "slug": "countries-chernogoriya",
+      "url": "https://www.aviasales.ru/countries/chernogoriya",
+      "type": "country",
+      "label": "Черногория",
+      "enabled": true
+    },
+    {
+      "slug": "countries-gruziya",
+      "url": "https://www.aviasales.ru/countries/gruziya",
+      "type": "country",
+      "label": "Грузия",
+      "enabled": true
+    },
+    {
+      "slug": "countries-belarus",
+      "url": "https://www.aviasales.ru/countries/belarus",
+      "type": "country",
+      "label": "Беларусь",
+      "enabled": true
+    }
+  ]
+}
