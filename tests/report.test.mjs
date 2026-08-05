@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { briefText, commonEntityPrefix, findingGroups } from '../lib/report.mjs';
+import { briefText, commonEntityPrefix, findingGroups, headingAnchor } from '../lib/report.mjs';
 
 const finding = (over) => ({
   severity: 'P2',
@@ -119,4 +119,12 @@ test('общий префикс адреса не дублируется в ка
   assert.equal(commonEntityPrefix([{ entity: 'нет nofollow: https://a' }, { entity: 'битая: https://b' }]), '');
   // Двоеточие без пробела — это часть имени тега, а не префикс вида проблемы.
   assert.equal(commonEntityPrefix([{ entity: 'og:image' }, { entity: 'og:title' }]), '');
+});
+
+test('якорь заголовка считается по правилам GitHub', () => {
+  // Тире и слэш выбрасываются вместе с пунктуацией, на их месте остаётся дефис от пробела —
+  // отсюда двойные дефисы. Если это разойдётся с GitHub, ссылки из таблицы перестанут прыгать.
+  assert.equal(headingAnchor('Код ответа сервера — 1'), 'код-ответа-сервера--1');
+  assert.equal(headingAnchor('Наличие Open Graph / Twitter meta — 20'), 'наличие-open-graph--twitter-meta--20');
+  assert.equal(headingAnchor('Alt-теги у всех изображений — 29'), 'alt-теги-у-всех-изображений--29');
 });
