@@ -1,6 +1,6 @@
 *SEO Pedant · прогон 2026-08-05*
-10 стр. · находок 238 (P1 4 · P2 195 · P3 39)
-:new: новых 238 · :white_check_mark: устранено 0 · это первый прогон
+10 стр. · находок 218 (P1 4 · P2 175 · P3 39)
+:new: новых 218 · :white_check_mark: устранено 0 · это первый прогон
 
 :hourglass_flowing_sand: _На время разработки внутренние ссылки проверяются частично: первые 10 на страницу. Внешние — все. Снять: development.enabled в config/scope.json._
 
@@ -8,7 +8,6 @@
 • :new: P1 Canonical указывает на саму страницу, без параметров: 3 — airports-zhukovsky-international-airport-zia, cities-batumi-bus, routes-nqz-ala
 • :new: P1 Код ответа сервера: 1 — countries-tailand
 • :new: P2 Внешние ссылки: 168 — все страницы
-• :new: P2 Наличие Open Graph / Twitter meta: 20 — все страницы
 • :new: P2 Title страницы: 5 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
 • :new: P2 H1 только один, с ключевыми словами: 1 — cities-batumi-bus
 • :new: P2 Ключевые слова встречаются в тексте и alt-тегах: 1 — cities-batumi-bus

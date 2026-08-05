@@ -265,14 +265,24 @@ test('sitemap: URL страницы найден в карте сайта', () =
   assert.equal(truncated.status, 'warn');
 });
 
-test('og-twitter: теги заполнены, картинка абсолютным URL', () => {
+test('og-twitter: следим за наличием тегов, относительный путь картинки — не проблема', () => {
   assert.equal(verdictOf(check('og-twitter'), GOOD).status, 'pass');
 
   const bad = verdictOf(check('og-twitter'), BAD);
-  assert.equal(bad.status, 'fail', 'относительный og:image ломает шаринг — это важнее P3');
-  const image = bad.findings.find((f) => f.entity === 'og:image');
-  assert.equal(image.severity, 'P2');
-  assert.ok(bad.findings.some((f) => f.entity === 'Twitter meta'));
+  assert.ok(bad.findings.some((f) => f.entity === 'Twitter meta'), 'отсутствие тегов — находка');
+
+  // Facebook и Twitter относительный путь достраивают сами, превью отрисовывается:
+  // владелец проверил на своих страницах, и находкой это быть перестало.
+  const relative =
+    '<html><head>' +
+    '<meta property="og:title" content="Т"><meta property="og:description" content="Д">' +
+    '<meta property="og:image" content="/og_images/default.png">' +
+    '<meta name="twitter:card" content="summary"><meta name="twitter:title" content="Т">' +
+    '<meta name="twitter:description" content="Д">' +
+    '<meta name="twitter:image" content="/og_images/default.png">' +
+    '</head><body></body></html>';
+  const verdict = verdictOf(check('og-twitter'), relative);
+  assert.equal(verdict.status, 'pass', 'относительный путь картинки находкой не считается');
 });
 
 test('content-placeholder: нет заглушек и текст не пустой', () => {
