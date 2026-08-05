@@ -45,7 +45,7 @@ function robotsSite(text, { sitemapFound = { [normUrl(URL)]: 'sitemap-1.xml' }, 
 
 const ROBOTS_OK = 'User-agent: *\nDisallow: /search\nSitemap: https://www.aviasales.ru/sitemap.xml';
 
-const NO_LIMITS = { own_domains: ['aviasales.ru'], development: { enabled: false, internal_links_per_page: null } };
+const NO_LIMITS = { development: { enabled: false, internal_links_per_page: null } };
 
 function linksArtifact(statuses, extra = {}) {
   const count = Object.keys(statuses).length;
@@ -320,24 +320,33 @@ test('внутренние и внешние ссылки — это две ра
   assert.equal(check('links-external').severity, 'P2', 'битая ссылка на чужой сайт — не наш баг');
 });
 
-test('свои домены задаются конфигом, а не доменом страницы', () => {
+test('свой домен — только домен самой страницы, остальные наши тоже внешние', () => {
   const html =
     '<html><body>' +
+    '<a href="https://www.aviasales.ru/countries/turtsiya">свой</a>' +
+    '<a href="https://m.aviasales.ru/countries/turtsiya">поддомен</a>' +
     '<a href="https://www.aviasales.ge/countries/turtsiya">GE</a>' +
     '<a href="https://www.aviasales.uz/countries/turtsiya">UZ</a>' +
     '<a href="https://example.com/x">чужой</a>' +
     '</body></html>';
-  const facts = factsFor(html, { ownDomains: ['aviasales.ru', 'aviasales.ge', 'aviasales.uz'] });
-  const internal = facts.html.links.filter((l) => l.internal).map((l) => l.site);
-  assert.deepEqual(internal, ['aviasales.ge', 'aviasales.uz']);
+
+  const ru = factsFor(html);
   assert.deepEqual(
-    facts.html.links.filter((l) => l.external).map((l) => l.site),
-    ['example.com'],
+    ru.html.links.filter((l) => l.internal).map((l) => l.site),
+    ['aviasales.ru', 'aviasales.ru'],
+    'поддомен — тот же домен, а вот .ge и .uz для .ru внешние',
+  );
+  assert.deepEqual(
+    ru.html.links.filter((l) => l.external).map((l) => l.site),
+    ['aviasales.ge', 'aviasales.uz', 'example.com'],
   );
 
-  // Убрали домен из конфига — ссылка на него становится внешней.
-  const narrow = factsFor(html, { ownDomains: ['aviasales.ru'] });
-  assert.equal(narrow.html.links.filter((l) => l.internal).length, 0);
+  // Та же разметка со страницы другого нашего домена: внутренним становится он.
+  const ge = factsFor(html, { url: 'https://www.aviasales.ge/cities/batumi-bus' });
+  assert.deepEqual(
+    ge.html.links.filter((l) => l.internal).map((l) => l.site),
+    ['aviasales.ge'],
+  );
 });
 
 test('links-internal: битые и nofollow на своих ссылках', () => {
@@ -382,7 +391,7 @@ test('links-internal: лимит на время разработки не пр�
   const limited = verdictOf(check('links-internal'), html, {
     links: linksArtifact(
       { 'https://www.aviasales.ru/a': { status: 200, error: null } },
-      { scope: { own_domains: ['aviasales.ru'], development: { enabled: true, internal_links_per_page: 1 } } },
+      { scope: { development: { enabled: true, internal_links_per_page: 1 } } },
     ),
   });
   assert.equal(limited.status, 'pass');
@@ -406,7 +415,7 @@ test('links-internal: лимит на время разработки не пр�
         'https://www.aviasales.ru/a': { status: 200, error: null },
         'https://www.aviasales.ru/b': { status: 200, error: null },
       },
-      { scope: { own_domains: ['aviasales.ru'], development: { enabled: true, internal_links_per_page: 1 } } },
+      { scope: { development: { enabled: true, internal_links_per_page: 1 } } },
     ),
   });
   assert.match(shared.note, /проверено 2 — лимит 1 на страницу.*общие для страниц ссылки проверяются один раз/);
