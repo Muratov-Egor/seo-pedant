@@ -172,14 +172,18 @@ test('canonical: на саму страницу и без параметров',
   assert.ok(relative.findings.some((f) => f.entity === 'абсолютность'));
 });
 
-test('canonical: если расходятся только домены, решение называет именно их', () => {
+test('canonical: решение зависит от вида поломки, но адресов в себе не несёт', () => {
   const url = 'https://www.aviasales.uz/airports/zhukovsky-international-airport-zia';
   const html = `<html><head><link rel="canonical" href="https://www.aviasales.ru/airports/zhukovsky-international-airport-zia"></head><body></body></html>`;
   const verdict = verdictOf(check('canonical'), html, { url });
 
   const address = verdict.findings.find((f) => f.entity === 'адрес');
   assert.ok(address, 'расхождение адреса должно находиться');
-  assert.equal(address.fix, 'Заменить домен в canonical: www.aviasales.ru → www.aviasales.uz.');
+  // Адресов в тексте нет намеренно: с ними у каждой страницы получался свой блок,
+  // хотя проблема и решение одни и те же. Сами адреса стоят рядом в таблице отчёта.
+  assert.equal(address.fix, 'Заменить домен в canonical на домен самой страницы — путь уже верный.');
+  assert.ok(!address.fix.includes('aviasales'), 'адрес страницы в решении не повторяем');
+  assert.equal(address.expected, 'canonical на саму страницу');
 
   // А когда отличается путь, а не домен, общего совета про домены быть не должно.
   const otherPath = verdictOf(
