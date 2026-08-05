@@ -6,6 +6,7 @@ import { keywordsFor, nameTokens, stem, translit } from '../lib/keywords.mjs';
 import { groupFor, normUrl, parseRobots, robotsDecision } from '../lib/collect/site.mjs';
 import { botWallReason, htmlFacts, urlFacts } from '../lib/facts.mjs';
 import { fingerprint, judge, pass } from '../lib/verdict.mjs';
+import { cheapest, findPrices, formatPrice, parseAmount } from '../lib/price.mjs';
 import { fixture } from './helpers.mjs';
 
 test('текст: нормализация и поиск по стему', () => {
@@ -171,7 +172,7 @@ test('facts: из HTML извлекается то, что проверяет ч
   assert.deepEqual(f.h1, ['Дешёвые авиабилеты в Турцию']);
   assert.deepEqual(
     f.headings.map((h) => h.level),
-    [1, 2, 2, 3, 3],
+    [1, 2, 2, 2, 3, 3],
   );
   assert.equal(f.og.image, 'https://static.aviasales.ru/og/turtsiya.png');
   assert.equal(f.twitter.card, 'summary_large_image');
@@ -228,4 +229,28 @@ test('отпечаток зависит только от адреса нахо�
   assert.notEqual(a, fingerprint('countries-turtsiya', 'title', 'длина', 1));
   assert.notEqual(a, fingerprint('countries-gruziya', 'title', 'длина', 0));
   assert.equal(a.length, 12);
+});
+
+test('цены: разряды, дробная часть и валюта до и после числа', () => {
+  assert.equal(parseAmount('9 283'), 9283);
+  assert.equal(parseAmount('138.93'), 138.93);
+  assert.equal(parseAmount('138,93'), 138.93);
+  // Одиночный разделитель ровно перед тремя цифрами — разрядный, а не дробный.
+  assert.equal(parseAmount('1,565'), 1565);
+  assert.equal(parseAmount('19 842'), 19842);
+
+  const found = findPrices('от 9 283 ₽ и ₾138.93, а также 12 000 тенге');
+  assert.deepEqual(
+    found.map((p) => [p.amount, p.currency]),
+    [
+      [9283, 'RUB'],
+      [138.93, 'GEL'],
+      [12000, 'KZT'],
+    ],
+  );
+  assert.equal(cheapest(found).amount, 138.93);
+  assert.equal(formatPrice(found[0]), '9 283 ₽');
+
+  // Числа без валюты ценами не считаются: иначе «3 ч 30 м в пути» стало бы ценой.
+  assert.deepEqual(findPrices('3 ч 30 м в пути / прямой'), []);
 });

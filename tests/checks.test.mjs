@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { ALL_CHECKS, checkById } from '../lib/checks/index.mjs';
+import { ALL_CHECKS, checkById, checklistItems, familySections } from '../lib/checks/index.mjs';
 import { effectiveSeverity } from '../lib/verdict.mjs';
 import { parseRobots, normUrl } from '../lib/collect/site.mjs';
 import { ctxFor, factsFor, fixture, verdictOf } from './helpers.mjs';
@@ -62,7 +62,7 @@ function statusesFor(html, status = 200) {
 }
 
 test('реестр проверок согласован', () => {
-  assert.equal(ALL_CHECKS.length, 23);
+  assert.equal(ALL_CHECKS.length, 24);
   assert.equal(new Set(ALL_CHECKS.map((c) => c.id)).size, ALL_CHECKS.length);
   assert.ok(ALL_CHECKS.every((c) => ['page', 'site'].includes(c.scope)));
   assert.ok(ALL_CHECKS.every((c) => ['P1', 'P2', 'P3'].includes(c.severity)));
@@ -634,4 +634,69 @@ test('performance: оценка Lighthouse не ниже порога', () => {
   });
   assert.equal(broken.status, 'warn');
   assert.equal(broken.findings[0].severity, 'P3');
+});
+
+test('title-price: цена из title показана на странице', () => {
+  assert.equal(verdictOf(check('title-price'), GOOD).status, 'pass');
+
+  // Страница без цен — не нарушение: так выглядят страницы аэропортов.
+  const noPrices = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 11 000 ₽</title></head><body><p>Табло и расписание рейсов.</p></body></html>',
+  );
+  assert.equal(noPrices.status, 'skip');
+
+  // Цены на странице есть, в title её нет.
+  const noPriceInTitle = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию</title></head><body><p>Билеты от 11 000 ₽.</p></body></html>',
+  );
+  assert.equal(noPriceInTitle.status, 'fail');
+  assert.equal(noPriceInTitle.findings[0].entity, 'цена в title');
+  assert.match(noPriceInTitle.findings[0].fix, /11 000 ₽/);
+
+  // Цена в title есть, но такой цены на странице нет.
+  const stale = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 11 000 ₽</title></head><body><p>Дешёвые билеты 13 400 ₽ и 15 900 ₽.</p></body></html>',
+  );
+  assert.equal(stale.status, 'fail');
+  assert.match(stale.findings[0].actual, /такой цены на странице нет/);
+  assert.match(stale.findings[0].note, /13 400 ₽/);
+
+  // Обновление цены между сборкой title и отрисовкой блока — в пределах допуска.
+  const refreshed = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 9 282 ₽</title></head><body><p>Дешёвые билеты 9 283 ₽ Москва — Анталья.</p></body></html>',
+  );
+  assert.equal(refreshed.status, 'pass');
+
+  // Валюта title и валюта страницы разошлись — это хуже отсутствия цены.
+  const currency = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Батуми от ₾138</title></head><body><p>Дешёвые билеты 13 400 ₽.</p></body></html>',
+  );
+  assert.equal(currency.status, 'fail');
+  assert.equal(currency.findings[0].severity, 'P1');
+
+  // Английская страница со своей валютой: точка — дробная часть, а не разряды.
+  const en = verdictOf(
+    check('title-price'),
+    '<html><head><title>Cheap flight tickets to Batumi from ₾138</title></head><body><p>Cheapest ticket ₾138.93</p></body></html>',
+  );
+  assert.equal(en.status, 'pass');
+});
+
+test('семейства проверок: у каждой проверки известное семейство', () => {
+  const sections = familySections();
+  assert.deepEqual(
+    sections.map((s) => s.family.id),
+    ['seo-checklist', 'content'],
+  );
+  assert.ok(sections.every((s) => s.items.length));
+  // Пункты одного семейства идут в чеклисте подряд — на этом держится разбивка отчёта.
+  const families = checklistItems().map((i) => i.family);
+  const blocks = families.filter((id, i) => id !== families[i - 1]);
+  assert.deepEqual(blocks, [...new Set(families)], 'семейства в чеклисте перемешаны');
+  assert.equal(new Set(families).size, sections.length);
 });
