@@ -636,7 +636,7 @@ test('performance: оценка Lighthouse не ниже порога', () => {
   assert.equal(broken.findings[0].severity, 'P3');
 });
 
-test('title-price: цена из title показана на странице', () => {
+test('title-price: в title самая дешёвая цена страницы', () => {
   assert.equal(verdictOf(check('title-price'), GOOD).status, 'pass');
 
   // Страница без цен — не нарушение: так выглядят страницы аэропортов.
@@ -655,14 +655,35 @@ test('title-price: цена из title показана на странице', 
   assert.equal(noPriceInTitle.findings[0].entity, 'цена в title');
   assert.match(noPriceInTitle.findings[0].fix, /11 000 ₽/);
 
-  // Цена в title есть, но такой цены на странице нет.
+  // Цена в title есть, но такой цены на странице нет, и все цены дороже.
   const stale = verdictOf(
     check('title-price'),
     '<html><head><title>Авиабилеты в Турцию от 11 000 ₽</title></head><body><p>Дешёвые билеты 13 400 ₽ и 15 900 ₽.</p></body></html>',
   );
   assert.equal(stale.status, 'fail');
+  assert.deepEqual(stale.findings.map((f) => f.entity), ['цена в title']);
   assert.match(stale.findings[0].actual, /такой цены на странице нет/);
-  assert.match(stale.findings[0].note, /13 400 ₽/);
+  assert.match(stale.findings[0].actual, /ближайшая — 13 400 ₽/);
+
+  // Цена из title на странице есть, но не самая дешёвая — в title кладём минимум.
+  const notMin = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 11 000 ₽</title></head><body>' +
+      '<p>Дешёвые билеты 11 000 ₽ Москва — Анталья. Дешевле всего лететь из Стамбула — от 2 551 ₽.</p>' +
+      '</body></html>',
+  );
+  assert.equal(notMin.status, 'fail');
+  assert.deepEqual(notMin.findings.map((f) => f.entity), ['минимальная цена страницы']);
+  assert.match(notMin.findings[0].actual, /на странице есть 2 551 ₽/);
+  // Цитата показывает, из какого блока приехала цена: без неё находку нельзя оценить.
+  assert.match(notMin.findings[0].evidence, /из Стамбула/);
+
+  // Цены из title на странице нет и она не минимальная — это две разные находки.
+  const both = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 11 000 ₽</title></head><body><p>Билеты 12 000 ₽ и 9 000 ₽.</p></body></html>',
+  );
+  assert.deepEqual(both.findings.map((f) => f.entity), ['цена в title', 'минимальная цена страницы']);
 
   // Обновление цены между сборкой title и отрисовкой блока — в пределах допуска.
   const refreshed = verdictOf(

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { collapse, hasAnyStem, hasStem, normalize, similarityPct, wordCount, sentenceWith } from '../lib/text.mjs';
+import { collapse, hasAnyStem, hasStem, normalize, similarityPct, wordCount, sentenceWith, quoteAround } from '../lib/text.mjs';
 import { keywordsFor, nameTokens, stem, translit } from '../lib/keywords.mjs';
 import { groupFor, normUrl, parseRobots, robotsDecision } from '../lib/collect/site.mjs';
 import { botWallReason, htmlFacts, urlFacts } from '../lib/facts.mjs';
@@ -253,4 +253,12 @@ test('цены: разряды, дробная часть и валюта до �
 
   // Числа без валюты ценами не считаются: иначе «3 ч 30 м в пути» стало бы ценой.
   assert.deepEqual(findPrices('3 ч 30 м в пути / прямой'), []);
+});
+
+test('цитата берётся окном вокруг слова, а не предложением с начала', () => {
+  const text = 'Хлебные крошки и много служебного текста. ' + 'слово '.repeat(40) + 'цена 2 551 ₽ в блоке';
+  const quote = quoteAround(text, '2 551 ₽');
+  assert.ok(quote.includes('2 551 ₽'), 'найденное слово обязано попасть в цитату');
+  assert.ok(quote.startsWith('…'), 'обрезанное начало помечается');
+  assert.equal(quoteAround(text, '9 999 ₽'), null);
 });
