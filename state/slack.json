@@ -4,11 +4,11 @@
     "thread_ts — метка последнего отправленного отчёта: следующий прогон читает",
     "по ней ответы владельца в треде и учитывает их."
   ],
-  "last_run": null,
+  "last_run": "2026-08-05",
   "channel_id": "C08664V7RUH",
-  "thread_ts": null,
-  "message_link": null,
+  "thread_ts": "1785929212.611289",
+  "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1785929212611289",
   "sent_as": "пользователь через Slack MCP (Slack App с bot-токеном пока не создан)",
-  "feedback_checked": false,
+  "feedback_checked": true,
   "previous": []
 }
