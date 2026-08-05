@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { commonEntityPrefix, findingGroups } from '../lib/report.mjs';
+import { briefText, commonEntityPrefix, findingGroups } from '../lib/report.mjs';
 
 const finding = (over) => ({
   severity: 'P2',
@@ -50,6 +50,64 @@ test('разные способы исправления не сливаются
 test('важность входит в группу: у разной важности разные заголовки', () => {
   const groups = findingGroups([finding({}), finding({ severity: 'P3', fingerprint: 'x' })]);
   assert.equal(groups.length, 2);
+});
+
+/** Прогон на N страниц, где одна и та же причина повторяется на каждой. */
+function runOf(pageCount) {
+  const findings = [];
+  for (let i = 0; i < pageCount; i++) {
+    findings.push(
+      finding({
+        slug: `page-${i}`,
+        fingerprint: `f${i}`,
+        message: 'og:image: ожидалось абсолютный URL',
+        fix: 'Заменить относительный путь на абсолютный URL.',
+        check_id: 'og-twitter',
+        checklist: 'Наличие Open Graph / Twitter meta',
+      }),
+    );
+  }
+  return {
+    runId: '2026-08-05',
+    previous_run: null,
+    previous_findings_count: 0,
+    totals: {
+      pages: pageCount,
+      findings: findings.length,
+      P1: 0,
+      P2: findings.length,
+      P3: 0,
+      new: 0,
+      resolved: 0,
+      unchecked_now: 0,
+      suppressed: 0,
+      blocked_pages: 0,
+    },
+    findings,
+    resolved: [],
+    unchecked_now: [],
+    pages: Array.from({ length: pageCount }, (_, i) => ({ slug: `page-${i}`, verdicts: [] })),
+  };
+}
+
+test('сводка для агента не растёт вместе с числом страниц', () => {
+  const ten = briefText(runOf(10)).split('\n').length;
+  const hundred = briefText(runOf(100)).split('\n').length;
+  assert.equal(ten, hundred, 'одна причина на всех страницах — одна запись, сколько бы их ни было');
+
+  const brief = briefText(runOf(100));
+  assert.match(brief, /все страницы/, 'вместо перечисления ста слагов — «все страницы»');
+  assert.ok(!brief.includes('page-42'), 'слаги поштучно в сводку не попадают');
+  assert.match(brief, /решение: Заменить относительный путь/, 'решение обязано быть в сводке');
+});
+
+test('сводка не путает устранённое с тем, что перестало проверяться', () => {
+  const run = runOf(1);
+  run.resolved = [{ slug: 'page-0', message: 'og:image был относительным' }];
+  run.unchecked_now = [{ slug: 'page-0', message: 'ssr — нет данных' }];
+  const brief = briefText(run);
+  assert.match(brief, /Устранено с прошлого прогона \(1\)/);
+  assert.match(brief, /Перестало проверяться \(1\) — это НЕ устранено/);
 });
 
 test('общий префикс адреса не дублируется в каждой строке', () => {

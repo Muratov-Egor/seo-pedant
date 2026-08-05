@@ -1,7 +1,7 @@
 {
-  "runId": "2026-08-05-2",
-  "checked_at": "2026-08-05T10:03:50.136Z",
-  "previous_run": "2026-08-05",
+  "runId": "2026-08-05-3",
+  "checked_at": "2026-08-05T10:27:11.374Z",
+  "previous_run": "2026-08-05-2",
   "totals": {
     "pages": 10,
     "blocked_pages": 0,
@@ -11,12 +11,12 @@
     "warn": 12,
     "skip": 20,
     "na": 0,
-    "findings": 236,
+    "findings": 237,
     "P1": 4,
-    "P2": 195,
+    "P2": 196,
     "P3": 37,
-    "new": 57,
-    "repeat": 179,
+    "new": 1,
+    "repeat": 236,
     "resolved": 0,
     "unchecked_now": 0,
     "suppressed": 0
