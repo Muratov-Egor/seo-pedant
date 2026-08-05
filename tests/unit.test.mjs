@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { collapse, hasStem, normalize, similarityPct, wordCount, sentenceWith } from '../lib/text.mjs';
+import { collapse, hasAnyStem, hasStem, normalize, similarityPct, wordCount, sentenceWith } from '../lib/text.mjs';
 import { keywordsFor, nameTokens, stem, translit } from '../lib/keywords.mjs';
 import { groupFor, normUrl, parseRobots, robotsDecision } from '../lib/collect/site.mjs';
 import { botWallReason, htmlFacts, urlFacts } from '../lib/facts.mjs';
@@ -87,6 +87,28 @@ test('ключевые слова выводятся для страниц ра�
   const bare = keywordsFor({ url: 'https://www.aviasales.ru/routes/mow/aer' });
   assert.equal(bare.entity, null);
   assert.deepEqual(bare.all.map((k) => k.stem), ['авиабилет']);
+});
+
+test('страница на английском: слово ищется и латиницей, и транслитом', () => {
+  // aviasales.ge отдаёт страницы на английском, поэтому ждать на них «Батуми» и
+  // «авиабилеты» бессмысленно: раньше это давало ложные находки в title, h1 и тексте.
+  const kw = keywordsFor({ url: 'https://www.aviasales.ge/cities/batumi-bus', label: 'Батуми' });
+  assert.deepEqual(kw.all.map((k) => k.stems), [
+    ['авиабилет', 'flight', 'ticket'],
+    ['батум', 'batumi'],
+  ]);
+
+  for (const text of ['Flights for Batumi', 'Cheap flight tickets to Batumi from ₾136']) {
+    assert.deepEqual(
+      kw.all.filter((k) => !hasAnyStem(text, k.stems)).map((k) => k.word),
+      [],
+      `на английском тексте ненайденных слов быть не должно: ${text}`,
+    );
+  }
+
+  // Русская страница по-прежнему находится по кириллице.
+  const ru = keywordsFor({ url: 'https://www.aviasales.ru/countries/turtsiya', label: 'Турция' });
+  assert.ok(ru.all.every((k) => hasAnyStem('Дешёвые авиабилеты в Турцию', k.stems)));
 });
 
 test('ключевые слова из конфига перекрывают автовывод', () => {
