@@ -1,0 +1,28 @@
+*SEO Pedant · прогон 2026-08-05-2*
+10 стр. · находок 224 (P1 4 · P2 175 · P3 45)
+:new: новых 9 · :white_check_mark: устранено 3 · прошлый прогон 2026-08-05: 218
+
+:hourglass_flowing_sand: _На время разработки внутренние ссылки проверяются частично: первые 10 на страницу. Внешние — все. Снять: development.enabled в config/scope.json._
+
+*Требует решения*
+• :repeat: P1 Canonical указывает на саму страницу, без параметров: 3 — airports-zhukovsky-international-airport-zia, cities-batumi-bus, routes-nqz-ala
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :new:1 P2 Внешние ссылки: 168 — все страницы
+• :repeat: P2 Title страницы: 5 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+• :repeat: P2 H1 только один, с ключевыми словами: 1 — cities-batumi-bus
+• :repeat: P2 Ключевые слова встречаются в тексте и alt-тегах: 1 — cities-batumi-bus
+
+*Не требует решения сейчас*
+• P3 Alt-теги у всех изображений: 29 (5 стр.)
+• P3 Нет ошибок в консоли: 10 (2 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
+
+*Устранено*
+• :white_check_mark: countries-chernogoriya: нет nofollow: https://vk.com/aviasales
+• :white_check_mark: countries-chernogoriya: Request timed out
+• :white_check_mark: countries-chernogoriya: sp.aviasales.ru/a/j
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Полный отчёт: https://github.com/Muratov-Egor/seo-pedant/blob/master/reports/2026-08-05-2.md
