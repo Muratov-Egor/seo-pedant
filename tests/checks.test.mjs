@@ -322,8 +322,20 @@ test('alt-tags: alt есть у всех картинок', () => {
   const missing = bad.findings.filter((f) => f.actual === 'атрибута alt нет');
   assert.equal(missing.length, 1);
   assert.equal(effectiveSeverity(missing[0], check('alt-tags')), 'P1');
-  // Пустой alt и слишком короткое описание — замечания, а не нарушение.
-  assert.equal(bad.findings.filter((f) => f.severity === 'P3').length, 2);
+  // Пустой alt — замечание, а не нарушение.
+  assert.equal(bad.findings.filter((f) => f.severity === 'P3').length, 1);
+
+  // Одно слово в alt проблемой не считается: «Брест» у картинки Бреста — это описание,
+  // а не недосмотр (alt_words_min в config/page-types/_default.json).
+  const oneWord = verdictOf(check('alt-tags'), '<html><body><img src="/a.png" alt="Брест"></body></html>');
+  assert.equal(oneWord.status, 'pass');
+
+  // А переспам ключевиками находкой остаётся.
+  const stuffed = verdictOf(
+    check('alt-tags'),
+    '<html><body><img src="/a.png" alt="дешёвые авиабилеты в Брест из Москвы недорого купить"></body></html>',
+  );
+  assert.equal(stuffed.status, 'warn');
 });
 
 test('внутренние и внешние ссылки — это две разные проверки', () => {
