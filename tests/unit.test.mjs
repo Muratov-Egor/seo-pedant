@@ -7,6 +7,7 @@ import { groupFor, normUrl, parseRobots, robotsDecision } from '../lib/collect/s
 import { botWallReason, htmlFacts, urlFacts } from '../lib/facts.mjs';
 import { fingerprint, judge, pass } from '../lib/verdict.mjs';
 import { cheapest, findPrices, formatPrice, parseAmount } from '../lib/price.mjs';
+import { directionOf, mainOrigin, roleOf, subjectOf } from '../lib/price-context.mjs';
 import { fixture } from './helpers.mjs';
 
 test('текст: нормализация и поиск по стему', () => {
@@ -261,4 +262,73 @@ test('цитата берётся окном вокруг слова, а не п
   assert.ok(quote.includes('2 551 ₽'), 'найденное слово обязано попасть в цитату');
   assert.ok(quote.startsWith('…'), 'обрезанное начало помечается');
   assert.equal(quoteAround(text, '9 999 ₽'), null);
+});
+
+test('роль цены: чья она и входит ли в обещание title', () => {
+  const route = subjectOf('/routes/mow/aer');
+  const role = (price, subject = route) => roleOf(price, subject).role;
+
+  // Карточка билета того же маршрута — своё предложение.
+  assert.equal(role({ raw: '4 205 ₽', own: '4 205 ₽', href: '/search/MOW1910AER1?t=x' }), 'offer');
+  // Карточка билета другого направления на странице маршрута — чужая.
+  assert.equal(role({ raw: '1 565 ₽', own: '1 565 ₽', href: '/search/MOW1910LED1?t=x' }), 'other-route');
+  // Ссылка на другую страницу-предмет — её обещание, не наше.
+  assert.equal(role({ raw: '8 058 ₽', own: '8 058 ₽', href: '/routes/led/aer' }), 'other-page');
+  // Цена без ссылки — утверждение самой страницы.
+  assert.equal(role({ raw: '4 236 ₽', own: 'Самая низкая цена 4 236 ₽', href: null }), 'offer');
+  // Тот же билет с багажом дороже базовой цены — минимум им не задаётся.
+  assert.equal(role({ raw: '5 591 ₽', own: '5 591 ₽ с багажом — 1 шт', href: null }), 'baggage');
+  // Статистика из текста — не предложение купить.
+  assert.equal(
+    role({ raw: '547 ₽', own: 'В среднем цены на перелёт составляют: от 547 ₽ — при раннем бронировании' }),
+    'aggregate',
+  );
+  // Столбик графика «Динамика цен» — цена на другой месяц.
+  assert.equal(
+    role({ raw: '5 432 ₽', own: '5 432 ₽', block: '20 480 ₽5 432 ₽9 254 ₽янв12 337 ₽фев12 460 ₽мар' }),
+    'chart',
+  );
+
+  // На странице страны билет из любого города — своё предложение: страница его показывает.
+  assert.equal(
+    role({ raw: '3 938 ₽', own: '3 938 ₽', href: '/search/KRR2808IST1?t=x' }, subjectOf('/countries/turtsiya')),
+    'offer',
+  );
+
+  // «с багажом» во втором предложении абзаца не делает багажной минимальную цену.
+  const paragraph =
+    'Минимальная цена авиабилета в Турцию — 11 000 ₽ (Москва — Анталья). Билет туда-обратно с багажом — от 19 400 ₽.';
+  assert.equal(role({ raw: '11 000 ₽', own: paragraph }), 'offer');
+  assert.equal(role({ raw: '19 400 ₽', own: paragraph }), 'baggage');
+});
+
+test('направление и город вылета читаются из ссылки карточки', () => {
+  assert.deepEqual(directionOf('/search/KRR2808IST1?t=x'), { from: 'krr', to: 'ist' });
+  assert.deepEqual(directionOf('https://www.aviasales.ru/routes/led/aer'), { from: 'led', to: 'aer' });
+  assert.equal(directionOf('/countries/turtsiya'), null);
+
+  // Преобладающий город вылета — тот, из которого страница показывает больше билетов.
+  const prices = [
+    { href: '/search/MOW0708AYT1' },
+    { href: '/search/MOW0708IST1' },
+    { href: '/search/KRR2808IST1' },
+    { href: null },
+  ];
+  assert.equal(mainOrigin(prices), 'mow');
+  assert.equal(mainOrigin([{ href: null }]), null);
+});
+
+test('facts: цены собираются вместе с блоком, и title в них не попадает', () => {
+  const f = htmlFacts(
+    '<html><head><title>Авиабилеты в Турцию от 9 261 ₽</title></head><body>' +
+      '<h2>Дешёвые билеты</h2><div><a href="/search/MOW0708AYT1?t=x"><span>9 262 ₽</span>' +
+      '<span>Москва — Анталья</span></a></div></body></html>',
+    'https://www.aviasales.ru/countries/turtsiya',
+  );
+  assert.equal(f.prices.length, 1, 'цена из <title> страницей не считается');
+  const [price] = f.prices;
+  assert.equal(price.amount, 9262);
+  assert.equal(price.heading, 'Дешёвые билеты');
+  assert.match(price.href, /^\/search\/MOW0708AYT1/);
+  assert.match(price.linkText, /Москва — Анталья/);
 });

@@ -662,7 +662,7 @@ test('title-price: в title самая дешёвая цена страницы'
   );
   assert.equal(stale.status, 'fail');
   assert.deepEqual(stale.findings.map((f) => f.entity), ['цена в title']);
-  assert.match(stale.findings[0].actual, /такой цены на странице нет/);
+  assert.match(stale.findings[0].actual, /такой цены нет/);
   assert.match(stale.findings[0].actual, /ближайшая — 13 400 ₽/);
 
   // Цена из title на странице есть, но не самая дешёвая — в title кладём минимум.
@@ -720,4 +720,63 @@ test('семейства проверок: у каждой проверки из
   const blocks = families.filter((id, i) => id !== families[i - 1]);
   assert.deepEqual(blocks, [...new Set(families)], 'семейства в чеклисте перемешаны');
   assert.equal(new Set(families).size, sections.length);
+});
+
+test('title-price: цены чужих блоков в минимум не идут', () => {
+  // Блок «Другие перелёты» ведёт на другую страницу-маршрут: его цены — чужое обещание.
+  const otherFlights = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты Москва — Сочи от 4 204 ₽</title></head><body>' +
+      '<h2>Дешёвые билеты</h2><div><a href="/search/MOW1910AER1?t=x"><span>4 205 ₽</span></a></div>' +
+      '<h2>Другие перелёты</h2><div><a href="/routes/mow/led"><span>Москва — Санкт-Петербург 1 565 ₽</span></a></div>' +
+      '</body></html>',
+    { url: 'https://www.aviasales.ru/routes/mow/aer', type: 'route' },
+  );
+  assert.equal(otherFlights.status, 'pass');
+
+  // Тот же блок, но цена того же маршрута — своя, и title ей противоречит.
+  const sameRoute = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты Москва — Сочи от 4 204 ₽</title></head><body>' +
+      '<div><a href="/search/MOW1910AER1?t=x"><span>4 205 ₽</span></a></div>' +
+      '<h2>Другие перелёты</h2><div><a href="/routes/mow/aer"><span>Москва — Сочи 1 726 ₽</span></a></div>' +
+      '</body></html>',
+    { url: 'https://www.aviasales.ru/routes/mow/aer', type: 'route' },
+  );
+  assert.equal(sameRoute.status, 'fail');
+  assert.match(sameRoute.findings[0].actual, /1 726 ₽/);
+  assert.match(sameRoute.findings[0].note, /В минимум взято цен/);
+
+  // Билет из другого города вылета дешевле — это не ложь в title для Москвы.
+  const otherOrigin = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 9 261 ₽</title></head><body>' +
+      '<div><a href="/search/MOW0708AYT1?t=x"><span>9 262 ₽</span></a></div>' +
+      '<div><a href="/search/KRR2808IST1?t=x"><span>3 938 ₽</span></a></div>' +
+      '</body></html>',
+    { url: 'https://www.aviasales.ru/countries/turtsiya' },
+  );
+  assert.equal(otherOrigin.status, 'pass');
+
+  // А из того же города — ложь.
+  const sameOrigin = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 9 261 ₽</title></head><body>' +
+      '<div><a href="/search/MOW0708AYT1?t=x"><span>9 262 ₽</span></a></div>' +
+      '<div><a href="/search/MOW0708IST1?t=x"><span>6 935 ₽</span></a></div>' +
+      '</body></html>',
+    { url: 'https://www.aviasales.ru/countries/turtsiya' },
+  );
+  assert.equal(sameOrigin.status, 'fail');
+  assert.match(sameOrigin.findings[0].actual, /6 935 ₽/);
+
+  // Цена из title не должна находиться сама в себе: <title> не часть страницы.
+  const onlyInTitle = verdictOf(
+    check('title-price'),
+    '<html><head><title>Авиабилеты в Турцию от 9 261 ₽</title></head><body>' +
+      '<div><a href="/search/MOW0708AYT1?t=x"><span>13 040 ₽</span></a></div></body></html>',
+    { url: 'https://www.aviasales.ru/countries/turtsiya' },
+  );
+  assert.equal(onlyInTitle.status, 'fail');
+  assert.match(onlyInTitle.findings[0].actual, /такой цены нет/);
 });
