@@ -65,6 +65,20 @@
       "type": "airport",
       "label": "Жуковский (ZIA)",
       "enabled": true
+    },
+    {
+      "slug": "routes-nqz-ala",
+      "url": "https://www.aviasales.kz/routes/nqz/ala",
+      "type": "route",
+      "label": "Астана — Алматы",
+      "enabled": true
+    },
+    {
+      "slug": "cities-batumi-bus",
+      "url": "https://www.aviasales.ge/cities/batumi-bus",
+      "type": "city",
+      "label": "Батуми",
+      "enabled": true
     }
   ]
 }
