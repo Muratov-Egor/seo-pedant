@@ -1,20 +1,23 @@
 *SEO Pedant · прогон 2026-08-05*
-8 стр. · находок 179 (P1 2 · P2 141 · P3 36)
-🆕 новых 179 · ✅ устранено 0 · это первый прогон
+10 стр. · находок 238 (P1 4 · P2 195 · P3 39)
+:new: новых 238 · :white_check_mark: устранено 0 · это первый прогон
 
-⏳ _На время разработки внутренние ссылки проверяются частично: первые 10 на страницу. Внешние — все. Снять: development.enabled в config/scope.json._
+:hourglass_flowing_sand: _На время разработки внутренние ссылки проверяются частично: первые 10 на страницу. Внешние — все. Снять: development.enabled в config/scope.json._
 
 *Требует решения*
-• 🆕 P1 Код ответа сервера: 1 — countries-tailand
-• 🆕 P1 Canonical указывает на саму страницу, без параметров: 1 — airports-zhukovsky-international-airport-zia
-• 🆕 P2 Внешние ссылки: 123 — все страницы
-• 🆕 P2 Наличие Open Graph / Twitter meta: 16 — все страницы
-• 🆕 P2 Title страницы: 2 — cities-moskva-mow, routes-mow-aer
+• :new: P1 Canonical указывает на саму страницу, без параметров: 3 — airports-zhukovsky-international-airport-zia, cities-batumi-bus, routes-nqz-ala
+• :new: P1 Код ответа сервера: 1 — countries-tailand
+• :new: P2 Внешние ссылки: 168 — все страницы
+• :new: P2 Наличие Open Graph / Twitter meta: 20 — все страницы
+• :new: P2 Title страницы: 5 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+• :new: P2 H1 только один, с ключевыми словами: 1 — cities-batumi-bus
+• :new: P2 Ключевые слова встречаются в тексте и alt-тегах: 1 — cities-batumi-bus
 
 *Не требует решения сейчас*
 • P3 Alt-теги у всех изображений: 29 (5 стр.)
 • P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
-• P3 Нет ошибок в консоли: 2 (1 стр.)
+• P3 Нет ошибок в консоли: 4 (2 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
 
 _Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
 
