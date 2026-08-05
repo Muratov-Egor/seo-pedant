@@ -32,6 +32,21 @@ test('находки группируются по виду проблемы, а
   assert.equal(groups[1].length, 1);
 });
 
+test('разные способы исправления не сливаются в одну группу', () => {
+  const common = 'Заменить относительный путь на абсолютный URL.';
+  const shared = findingGroups([
+    finding({ fix: common }),
+    finding({ entity: 'twitter:image', fingerprint: 'b', fix: common }),
+  ]);
+  assert.equal(shared.length, 1, 'одно решение на две находки — одна группа');
+
+  const split = findingGroups([
+    finding({ fix: common }),
+    finding({ entity: 'twitter:image', fingerprint: 'b', fix: 'Убрать тег.' }),
+  ]);
+  assert.equal(split.length, 2, 'разные решения — разные группы, иначе одно из них потеряется');
+});
+
 test('важность входит в группу: у разной важности разные заголовки', () => {
   const groups = findingGroups([finding({}), finding({ severity: 'P3', fingerprint: 'x' })]);
   assert.equal(groups.length, 2);

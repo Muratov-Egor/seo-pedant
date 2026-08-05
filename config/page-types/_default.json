@@ -22,7 +22,7 @@
     "report_collapse_threshold": 12
   },
   "checks": {
-    "disabled": [],
+    "disabled": ["performance"],
     "severity_overrides": {}
   }
 }

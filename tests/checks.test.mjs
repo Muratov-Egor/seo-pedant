@@ -172,6 +172,40 @@ test('canonical: на саму страницу и без параметров',
   assert.ok(relative.findings.some((f) => f.entity === 'абсолютность'));
 });
 
+test('canonical: если расходятся только домены, решение называет именно их', () => {
+  const url = 'https://www.aviasales.uz/airports/zhukovsky-international-airport-zia';
+  const html = `<html><head><link rel="canonical" href="https://www.aviasales.ru/airports/zhukovsky-international-airport-zia"></head><body></body></html>`;
+  const verdict = verdictOf(check('canonical'), html, { url });
+
+  const address = verdict.findings.find((f) => f.entity === 'адрес');
+  assert.ok(address, 'расхождение адреса должно находиться');
+  assert.equal(address.fix, 'Заменить домен в canonical: www.aviasales.ru → www.aviasales.uz.');
+
+  // А когда отличается путь, а не домен, общего совета про домены быть не должно.
+  const otherPath = verdictOf(
+    check('canonical'),
+    '<html><head><link rel="canonical" href="https://www.aviasales.ru/countries/tailand"></head><body></body></html>',
+  );
+  const byPath = otherPath.findings.find((f) => f.entity === 'адрес');
+  assert.match(byPath.fix, /адрес самой страницы/);
+});
+
+test('у каждой находки есть краткое «как исправить»', () => {
+  // Проверки, которым хватает HTML и ответа сервера: их можно прогнать по битой
+  // фикстуре здесь же. Без этой страховки новая проверка молча приезжает без решения.
+  const offline = new Set(['response', 'html']);
+  const runnable = ALL_CHECKS.filter(
+    (c) => c.scope === 'page' && (c.needs ?? []).every((n) => offline.has(n)),
+  );
+  assert.ok(runnable.length >= 10, 'фикстура должна покрывать большинство проверок');
+
+  for (const c of runnable) {
+    for (const finding of verdictOf(c, BAD).findings) {
+      assert.ok(finding.fix, `${c.id}: находка «${finding.entity}» без совета как исправить`);
+    }
+  }
+});
+
 test('h1: один, непустой, с ключевыми словами', () => {
   assert.equal(verdictOf(check('h1'), GOOD).status, 'pass');
 
