@@ -1,7 +1,7 @@
 {
-  "runId": "2026-08-06-3",
-  "checked_at": "2026-08-06T09:25:17.123Z",
-  "previous_run": "2026-08-05-3",
+  "runId": "2026-08-07",
+  "checked_at": "2026-08-07T04:11:29.622Z",
+  "previous_run": "2026-08-06-3",
   "totals": {
     "pages": 10,
     "blocked_pages": 0,
@@ -15,10 +15,10 @@
     "P1": 4,
     "P2": 304,
     "P3": 6,
-    "new": 132,
-    "repeat": 182,
+    "new": 0,
+    "repeat": 314,
     "resolved": 0,
-    "unchecked_now": 2,
+    "unchecked_now": 0,
     "suppressed": 0
   }
 }
