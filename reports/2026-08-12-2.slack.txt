@@ -1,0 +1,33 @@
+*SEO Pedant · прогон 2026-08-12-2*
+10 стр. · находок 718 (P1 488 · P2 178 · P3 52)
+:new: новых 12 · :white_check_mark: устранено 8 · прошлый прогон 2026-08-12: 714
+
+*Требует решения*
+• :new:5 P1 Внутренние ссылки: 484 — 6 стр.
+• :repeat: P1 Canonical указывает на саму страницу, без параметров: 3 — airports-zhukovsky-international-airport-zia, cities-batumi-bus, routes-nqz-ala
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :repeat: P2 Внешние ссылки: 167 — все страницы
+• :new:5 P2 Внутренние ссылки: 6 — cities-moskva-mow, countries-gruziya, countries-turtsiya
+• :repeat: P2 Title страницы: 4 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+• :new: P2 SSR — контент доступен сразу в HTML: 1 — cities-batumi-bus
+
+*Не требует решения сейчас*
+• P3 Нет ошибок в консоли: 32 (10 стр.)
+• P3 Внешние ссылки: 10 (10 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 Внутренние ссылки: 3 (3 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 2 (2 стр.)
+
+*Устранено*
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/3o?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/et?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/hh?language=ru
+• :white_check_mark: countries-chernogoriya: битая: https://www.aviasales.ru/airlines/a9?language=ru
+• :white_check_mark: countries-chernogoriya: битая: https://www.aviasales.ru/airlines/sk?language=ru
+• :white_check_mark: countries-tailand: битая: https://www.aviasales.ru/airlines/e9?language=ru
+• :white_check_mark: countries-tailand: битая: https://www.aviasales.ru/airlines/la?language=ru
+• :white_check_mark: countries-tailand: битая: https://www.aviasales.ru/airlines/ov?language=ru
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-12-2.html
