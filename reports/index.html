@@ -90,6 +90,7 @@ td.runid{font-family:var(--mono);font-weight:600}
 .b-new{color:var(--accent);background:var(--accent-soft)}
 .lnk{font-size:12px;color:var(--accent)}
 .lnk+.lnk{margin-left:8px}
+.muted{color:var(--ink-soft)}
 .state{color:var(--ink-soft);padding:40px 0;text-align:center}
 .err{color:var(--p1)}
 .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
@@ -351,10 +352,25 @@ function renderTable(runs){
     '<td class="num"><span class="badge b-P2">'+r.P2+'</span></td>'+
     '<td class="num"><span class="badge b-P3">'+r.P3+'</span></td>'+
     '<td class="num"><span class="badge b-new">'+r.new+'</span></td>'+
-    '<td><a class="lnk" href="'+encodeURIComponent(r.run)+'.html">HTML</a>'+
+    '<td class="rep">'+
+    '<a class="lnk" href="'+encodeURIComponent(r.run)+'.html">HTML</a>'+
     '<a class="lnk" href="'+encodeURIComponent(r.run)+'.md">MD</a></td>'+
     '</tr>'
   ).join('');
+  probeReports();
+}
+
+// файлы отчётов появляются в reports/ только после прогона (у старых прогонов есть
+// только .md). Проверяем существование HEAD-запросом и убираем ссылки на то, чего нет.
+async function probeReports(){
+  for(const cell of document.querySelectorAll('#tbody .rep')){
+    for(const a of [...cell.querySelectorAll('a')]){
+      let ok=false;
+      try{ ok=(await fetch(a.getAttribute('href'),{method:'HEAD'})).ok; }catch{}
+      if(!ok) a.remove();
+    }
+    if(!cell.querySelector('a')) cell.innerHTML='<span class="muted">—</span>';
+  }
 }
 
 load();
