@@ -123,6 +123,98 @@ test('общий префикс адреса не дублируется в ка
   assert.equal(commonEntityPrefix([{ entity: 'og:image' }, { entity: 'og:title' }]), '');
 });
 
+/** Минимальный прогон под html() из списка находок. */
+function runWith(findings) {
+  const pages = [...new Set(findings.map((f) => f.slug))].map((slug) => ({ slug, verdicts: [] }));
+  const bySev = (s) => findings.filter((f) => f.severity === s).length;
+  return {
+    runId: '2026-08-12',
+    generated_at: '2026-08-12T09:00:00.000Z',
+    previous_run: null,
+    previous_findings_count: 0,
+    scope: {},
+    blocked: [],
+    resolved: [],
+    unchecked_now: [],
+    suppressed: [],
+    totals: {
+      pages: pages.length,
+      findings: findings.length,
+      P1: bySev('P1'),
+      P2: bySev('P2'),
+      P3: bySev('P3'),
+      new: 0,
+      repeat: findings.length,
+      resolved: 0,
+      unchecked_now: 0,
+      suppressed: 0,
+      blocked_pages: 0,
+    },
+    findings,
+    pages,
+  };
+}
+
+/** Имена групп из встроенного JSON html-отчёта. */
+function groupNames(run) {
+  const out = html(run);
+  const json = out.split('<script id="data" type="application/json">')[1].split('</script>')[0];
+  return JSON.parse(json.replace(/\\u003c/g, '<')).findGroups.map((g) => g.name);
+}
+
+test('заголовки групп одной проверки различаются видом проблемы', () => {
+  // Настоящий check_id, иначе группа не соберётся под пунктом чеклиста.
+  const links = ALL_CHECKS.find((c) => c.id === 'links-internal');
+  assert.ok(links, 'проверка links-internal есть в реестре');
+  const base = (over) => ({
+    check_id: links.id,
+    checklist: links.checklist,
+    status: 'repeat',
+    days_seen: 1,
+    ...over,
+  });
+
+  const names = groupNames(
+    runWith([
+      // Две «битая» с общим префиксом, но разной важностью — префикс совпал, поэтому
+      // различитель берётся из «ожидалось».
+      base({ slug: 'p1', fingerprint: 'a', severity: 'P1', entity: 'битая: https://a', expected: 'ссылка отдаёт 2xx или 3xx', fix: 'Поправить адрес' }),
+      base({ slug: 'p2', fingerprint: 'b', severity: 'P2', entity: 'битая: https://b', expected: 'ссылка открывается', fix: 'Проверить адрес' }),
+      // Своя разновидность с уникальным префиксом — различитель берётся из него.
+      base({ slug: 'p3', fingerprint: 'c', severity: 'P2', entity: 'nofollow внутри: https://c', expected: 'без nofollow', fix: 'Убрать nofollow' }),
+    ]),
+  );
+
+  assert.equal(new Set(names).size, 3, 'три группы — три разных заголовка');
+  assert.ok(names.every((n) => n.startsWith('Внутренние ссылки')), 'название пункта сохраняется');
+  assert.ok(names.some((n) => n.includes('ссылка отдаёт 2xx или 3xx')), 'коллизия префикса разводится через «ожидалось»');
+  assert.ok(names.some((n) => n.includes('ссылка открывается')));
+  assert.ok(names.some((n) => n.includes('nofollow внутри')), 'уникальный префикс идёт в заголовок как есть');
+});
+
+test('одна группа в проверке — заголовок без приписки вида', () => {
+  const title = ALL_CHECKS.find((c) => c.id === 'title');
+  assert.ok(title, 'проверка title есть в реестре');
+  const names = groupNames(
+    runWith([
+      {
+        check_id: title.id,
+        checklist: title.checklist,
+        slug: 'p1',
+        fingerprint: 'a',
+        severity: 'P2',
+        entity: 'title',
+        expected: 'длина 30–70',
+        actual: '95',
+        status: 'repeat',
+        days_seen: 1,
+      },
+    ]),
+  );
+  assert.equal(names.length, 1);
+  assert.ok(!names[0].includes(' — '), 'при одной группе вид проблемы не приписывается');
+});
+
 test('якорь заголовка считается по правилам GitHub', () => {
   // Тире и слэш выбрасываются вместе с пунктуацией, на их месте остаётся дефис от пробела —
   // отсюда двойные дефисы. Если это разойдётся с GitHub, ссылки из таблицы перестанут прыгать.

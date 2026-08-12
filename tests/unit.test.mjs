@@ -198,6 +198,47 @@ test('facts: битый JSON-LD не роняет разбор страницы'
   assert.equal(f.images.filter((i) => !i.hasAlt).length, 1);
 });
 
+test('facts: у ссылок и картинок определяется блок страницы', () => {
+  // Ссылка «нигде» стоит первой — до неё нет ни лендмарка, ни заголовка, поэтому
+  // блок обязан выйти пустым, а не унаследовать заголовок из main ниже.
+  const htmlSrc = `<!doctype html><html><body>
+    <div><a href="/nowhere">нигде</a></div>
+    <header><a href="/h">в шапке</a></header>
+    <nav><a href="/n">в меню</a></nav>
+    <main>
+      <section>
+        <h2>Дешёвые билеты</h2>
+        <p><a href="/c">в контенте</a> <img src="/i.png" alt="картинка тут"></p>
+      </section>
+    </main>
+    <div role="navigation"><a href="/role">по role</a></div>
+    <footer><a href="/f">в подвале</a></footer>
+  </body></html>`;
+  const f = htmlFacts(htmlSrc, 'https://www.aviasales.ru/');
+  const block = (href) => f.links.find((l) => l.href === href)?.block;
+
+  assert.equal(block('/h'), 'шапка');
+  assert.equal(block('/n'), 'меню');
+  assert.equal(block('/role'), 'меню', 'role="navigation" распознаётся как меню без семантического тега');
+  assert.equal(block('/f'), 'подвал');
+  assert.equal(block('/c'), 'контент → «Дешёвые билеты»', 'в main блок дополняется заголовком секции');
+  assert.equal(block('/nowhere'), '', 'без лендмарка и заголовка выше — блок пустой');
+  assert.equal(f.images[0].block, 'контент → «Дешёвые билеты»', 'у картинки блок считается так же, как у ссылки');
+});
+
+test('вердикт: блок находки сохраняется, а без него остаётся null', () => {
+  const v = judge(
+    [
+      { entity: 'битая: https://a', severity: 'P1', block: 'подвал' },
+      { entity: 'битая: https://b', severity: 'P1' },
+    ],
+    'P1',
+  );
+  assert.equal(v.status, 'fail');
+  assert.equal(v.findings[0].block, 'подвал', 'блок доходит до нормализованной находки');
+  assert.equal(v.findings[1].block, null, 'без блока поле не выдумывается');
+});
+
 test('заглушка защиты от ботов не считается страницей', () => {
   assert.equal(botWallReason(200, fixture('country-good')), null);
 
