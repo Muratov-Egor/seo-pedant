@@ -11,3 +11,6 @@ data/cache/
 
 # Секреты появятся, когда доставку возьмёт на себя Slack App
 .env
+
+# Playwright MCP scratch output
+.playwright-mcp/
