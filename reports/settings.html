@@ -62,10 +62,20 @@ tr:last-child td{border-bottom:0}
 .sethead{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
 .sethead h2{margin:0}
 .sethead .cnt{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
-.pg-type{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);text-transform:uppercase;letter-spacing:.02em}
-.pg-url{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);max-width:340px;overflow:hidden;text-overflow:ellipsis}
-td.tight{white-space:normal}
+.pg-type{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap}
+.pg-url{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+/* без горизонтального скролла: длинные slug/URL переносятся, а не прокручиваются */
+#settings .tblwrap{overflow-x:visible}
+#settings td,#settings th{white-space:normal}
+#settings td.tight{word-break:break-word}
+#settings td code,#settings .pg-url{word-break:break-all}
+#settings td.ctr{white-space:nowrap;text-align:center}
 .rowoff{opacity:.5}
+/* массовое добавление */
+.bulk summary{cursor:pointer;font-weight:650;font-size:13px;color:var(--accent);margin-top:16px;list-style:none}
+.bulk summary::-webkit-details-marker{display:none}
+.bulk summary::before{content:"＋ ";font-weight:700}
+.bulk textarea{width:100%;min-height:92px;margin-top:10px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;color:var(--ink);font-family:var(--mono);font-size:12px;resize:vertical}
 .sw{position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex:none}
 .sw input{opacity:0;width:0;height:0;position:absolute}
 .sw .track{position:absolute;inset:0;background:var(--line-strong);border-radius:11px;transition:background .15s}
@@ -77,9 +87,10 @@ td.tight{white-space:normal}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn-ghost{border-color:transparent;color:var(--p1);padding:5px 9px}
 .btn-ghost:hover{background:var(--p1-bg);border-color:transparent}
-.pg-form{display:grid;grid-template-columns:1.6fr 130px 1fr;gap:10px;align-items:end;margin-top:14px}
+.pg-form{display:grid;grid-template-columns:140px 1fr 1fr;gap:10px 12px;align-items:end;margin-top:14px}
 @media(max-width:680px){.pg-form{grid-template-columns:1fr}}
 .pg-form .full{grid-column:1/-1}
+.pg-form .actionfld{align-items:flex-start}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:650}
 .fld input,.fld select{background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;color:var(--ink);font:inherit;font-size:13px}
@@ -132,12 +143,20 @@ td.tight{white-space:normal}
           <input id="f-label" type="text" placeholder="Испания"></div>
         <div class="fld"><label for="f-slug">Slug <span style="text-transform:none;font-weight:400">(из URL, можно поправить)</span></label>
           <input id="f-slug" class="mono" type="text" placeholder="countries-ispaniya"></div>
-        <div class="fld"><label for="f-keywords">Ключевые слова <span style="text-transform:none;font-weight:400">(через запятую, необязательно)</span></label>
+        <div class="fld full"><label for="f-keywords">Ключевые слова <span style="text-transform:none;font-weight:400">(через запятую, необязательно)</span></label>
           <input id="f-keywords" type="text" placeholder="испания, авиабилеты"></div>
-        <div class="fld"><label>&nbsp;</label>
+        <div class="fld full actionfld">
           <button class="btn btn-primary" type="submit">Добавить страницу</button></div>
       </form>
       <div class="hintline" id="pgformhint"></div>
+
+      <details class="bulk">
+        <summary>Добавить сразу несколько</summary>
+        <label for="f-bulk" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:650;margin-top:10px">По одному URL в строке — тип определится по пути (countries / cities / routes / airports)</label>
+        <textarea id="f-bulk" spellcheck="false" placeholder="https://www.aviasales.ru/countries/ispaniya&#10;https://www.aviasales.ru/cities/sochi-aer&#10;https://www.aviasales.ru/routes/led/mow"></textarea>
+        <button class="btn" type="button" id="bulkadd" style="margin-top:8px">Добавить все</button>
+        <div class="hintline" id="bulkhint"></div>
+      </details>
 
       <div class="warn">
         <b>Как применить изменения.</b> Страница ничего не пишет на диск — она статическая.
@@ -227,9 +246,9 @@ function renderPages(){
     '<td><code>'+esc(p.slug)+'</code></td>'+
     '<td><div class="pg-url" title="'+esc(p.url)+'">'+esc(p.url)+'</div></td>'+
     '<td><span class="pg-type">'+esc(p.type)+'</span></td>'+
-    '<td style="text-align:center"><label class="sw"><input type="checkbox" data-tgl="'+i+'"'+(p.enabled?' checked':'')+'>'+
+    '<td class="ctr"><label class="sw"><input type="checkbox" data-tgl="'+i+'"'+(p.enabled?' checked':'')+'>'+
       '<span class="track"></span><span class="knob"></span></label></td>'+
-    '<td style="text-align:right"><button class="btn-ghost" type="button" data-del="'+i+'">Удалить</button></td>'+
+    '<td class="ctr" style="text-align:right"><button class="btn-ghost" type="button" data-del="'+i+'">Удалить</button></td>'+
     '</tr>'
   ).join('');
   syncExport();
@@ -275,6 +294,33 @@ $('pgform').addEventListener('submit',e=>{
   hint.innerHTML='Добавлена <code>'+esc(slug)+'</code>. Не забудьте скопировать JSON и, после коммита, собрать страницу: <code>node lib/collect.mjs --slug '+esc(slug)+'</code>.';
   e.target.reset(); slugTouched=false;
   renderPages();
+});
+
+// тип по первому сегменту пути; если не угадали — берём выбранный в форме
+function guessType(url){
+  try{
+    const seg=new URL(url).pathname.split('/').filter(Boolean)[0];
+    return {countries:'country',cities:'city',routes:'route',airports:'airport'}[seg]||$('f-type').value;
+  }catch{ return $('f-type').value; }
+}
+
+// массовое добавление: по одному URL в строке
+$('bulkadd').addEventListener('click',()=>{
+  const lines=$('f-bulk').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const h=$('bulkhint');
+  if(!lines.length){ h.innerHTML='<span class="err">Вставьте хотя бы один URL.</span>'; return; }
+  let added=0; const skipped=[];
+  for(const url of lines){
+    const slug=slugFromUrl(url);
+    if(!slug){ skipped.push(esc(url)+' — не URL'); continue; }
+    if(pgList.some(p=>p.slug===slug)){ skipped.push('<code>'+esc(slug)+'</code> — уже в списке'); continue; }
+    pgList.push({slug,url,type:guessType(url),label:'',enabled:true});
+    added++;
+  }
+  h.innerHTML='Добавлено: <b>'+added+'</b>'+
+    (skipped.length?'. Пропущено '+skipped.length+': '+skipped.join('; '):'')+
+    (added?'.<br>Проставьте названия и, при необходимости, тип в JSON ниже, затем скопируйте его в <code>config/pages.json</code>. Новые страницы соберутся при <code>npm run audit</code>.':'');
+  if(added){ $('f-bulk').value=''; renderPages(); }
 });
 
 $('pgcopy').addEventListener('click',async()=>{
