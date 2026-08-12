@@ -4,7 +4,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { briefText, commonEntityPrefix, findingGroups, headingAnchor } from '../lib/report.mjs';
+import { briefText, commonEntityPrefix, findingGroups, headingAnchor, html } from '../lib/report.mjs';
+
+import { ALL_CHECKS } from '../lib/checks/index.mjs';
 
 const finding = (over) => ({
   severity: 'P2',
@@ -130,4 +132,127 @@ test('якорь заголовка считается по правилам Git
   assert.equal(headingAnchor('P2, P3 · Ключевые слова — 6'), 'p2-p3--ключевые-слова--6');
   assert.equal(headingAnchor('Наличие Open Graph / Twitter meta — 20'), 'наличие-open-graph--twitter-meta--20');
   assert.equal(headingAnchor('Alt-теги у всех изображений — 29'), 'alt-теги-у-всех-изображений--29');
+});
+
+// ── интерактивный HTML-отчёт ──────────────────────────────────────────────────
+
+/** Синтетический прогон: три страницы, находки разной важности, устранённое и skip. */
+function syntheticRun() {
+  // Берём настоящие check_id из реестра — иначе checkLabel вернёт голый id, а матрица
+  // и группы не соберутся по пунктам чеклиста.
+  const c1 = ALL_CHECKS[0];
+  const c2 = ALL_CHECKS[1] ?? ALL_CHECKS[0];
+
+  const f = (over) => ({
+    severity: 'P2',
+    check_id: c1.id,
+    checklist: c1.checklist,
+    slug: 'countries-belarus',
+    status: 'repeat',
+    entity: 'og:image',
+    expected: 'абсолютный URL картинки',
+    note: 'превью не отрисуется',
+    fix: 'Заменить относительный путь на абсолютный URL.',
+    evidence: '<meta property="og:image" content="/og.png">',
+    actual: '/og.png',
+    days_seen: 3,
+    fingerprint: 'fp',
+    ...over,
+  });
+
+  const findings = [
+    f({ severity: 'P1', check_id: c2.id, checklist: c2.checklist, status: 'new', fingerprint: 'a', days_seen: 1 }),
+    f({ fingerprint: 'b' }),
+    f({ slug: 'countries-gruziya', fingerprint: 'c' }),
+    f({ severity: 'P3', slug: 'airports-zia', fingerprint: 'd', entity: 'ключевые слова' }),
+  ];
+
+  const page = (slug, over) => ({
+    slug,
+    label: slug,
+    url: `https://example.com/${slug}`,
+    final_url: `https://example.com/${slug}`,
+    http_status: 200,
+    type: 'country',
+    verdicts: [
+      { check_id: c1.id, status: 'fail', findings: [{}] },
+      { check_id: c2.id, status: 'pass', findings: [] },
+    ],
+    ...over,
+  });
+
+  return {
+    runId: '2026-08-12',
+    generated_at: '2026-08-12T09:00:00.000Z',
+    previous_run: '2026-08-11',
+    previous_findings_count: 6,
+    scope: {},
+    checks: ALL_CHECKS.map((c) => ({ id: c.id })),
+    blocked: [],
+    totals: {
+      pages: 3,
+      blocked_pages: 0,
+      findings: findings.length,
+      P1: 1,
+      P2: 2,
+      P3: 1,
+      new: 1,
+      repeat: 3,
+      resolved: 1,
+      unchecked_now: 0,
+      suppressed: 0,
+    },
+    pages: [
+      page('countries-belarus'),
+      page('countries-gruziya'),
+      page('airports-zia', {
+        verdicts: [
+          { check_id: c1.id, status: 'warn', findings: [{}] },
+          { check_id: c2.id, status: 'skip', reason: 'ssr — нет данных' },
+        ],
+      }),
+    ],
+    findings,
+    resolved: [{ slug: 'countries-turtsiya', checklist: c1.checklist, message: 'og:image был относительным' }],
+    unchecked_now: [],
+    suppressed: [],
+  };
+}
+
+test('html(run) возвращает самодостаточный документ с ключевыми секциями', () => {
+  const out = html(syntheticRun());
+
+  assert.equal(typeof out, 'string');
+  assert.match(out, /^<!doctype html>/i, 'полноценный HTML-документ');
+  assert.ok(out.trim().endsWith('</html>'), 'документ закрыт');
+
+  // KPI и переключатель срезов.
+  assert.match(out, /Критично · P1/);
+  assert.match(out, /По важности/);
+  assert.match(out, /По страницам/);
+  assert.match(out, /Матрица/);
+
+  // Severity-бейджи и данные встроены как JSON.
+  assert.match(out, /b-P1/);
+  assert.match(out, /<script id="data" type="application\/json">/);
+
+  // Название пункта чеклиста попало в данные.
+  assert.ok(out.includes(ALL_CHECKS[0].checklist), 'название чеклист-пункта присутствует');
+
+  // Ни один сырой `<` не утёк в JSON-блок — иначе он закрыл бы </script> раньше времени.
+  const json = out.split('<script id="data" type="application/json">')[1].split('</script>')[0];
+  assert.ok(!json.includes('<'), 'в JSON-данных нет неэкранированных <');
+  const D = JSON.parse(json.replace(/\\u003c/g, '<'));
+  assert.equal(D.stats.runId, '2026-08-12');
+  assert.ok(D.findGroups.length > 0, 'группы находок построены');
+  assert.ok(D.pageSlice.length > 0, 'срез по страницам построен');
+  assert.ok(D.matrix.length > 0, 'матрица построена');
+});
+
+test('html(run) не падает на первом прогоне без previous_run', () => {
+  const run = syntheticRun();
+  run.previous_run = null;
+  run.previous_findings_count = 0;
+  const out = html(run);
+  assert.match(out, /первый прогон/);
 });
