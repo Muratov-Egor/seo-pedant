@@ -1,0 +1,309 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEO-аудит aviasales.ru — настройки</title>
+<style>
+/* Дизайн-токены — те же, что у дашборда истории (index.html) и отчётов одного
+   прогона, чтобы всё читалось как одна система. */
+:root{
+  --bg:#f5f6fa; --panel:#ffffff; --panel-2:#fbfcfe; --ink:#1a1d27; --ink-soft:#565b6b;
+  --line:#e4e7ef; --line-strong:#d2d7e3;
+  --accent:#3b5bdb; --accent-soft:#e7ecfd;
+  --p1:#d6336c; --p1-bg:#fce4ec; --p2:#e8890c; --p2-bg:#fdf0dc; --p3:#5b73d6; --p3-bg:#e9edfb;
+  --ok:#2f9e44; --ok-bg:#e6f4ea;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1016; --panel:#171a23; --panel-2:#1c1f2b; --ink:#e8eaf1; --ink-soft:#9aa0b2;
+  --line:#262a38; --line-strong:#333849; --accent:#7089f7; --accent-soft:#20263c;
+  --p1:#ff85a8; --p1-bg:#2c1721; --p2:#ffb454; --p2-bg:#2c2213; --p3:#8ea0f0; --p3-bg:#1a1f34;
+  --ok:#69db7c; --ok-bg:#15251a;
+}}
+:root[data-theme="light"]{
+  --bg:#f5f6fa; --panel:#fff; --panel-2:#fbfcfe; --ink:#1a1d27; --ink-soft:#565b6b;
+  --line:#e4e7ef; --line-strong:#d2d7e3; --accent:#3b5bdb; --accent-soft:#e7ecfd;
+  --p1:#d6336c; --p1-bg:#fce4ec; --p2:#e8890c; --p2-bg:#fdf0dc; --p3:#5b73d6; --p3-bg:#e9edfb; --ok:#2f9e44; --ok-bg:#e6f4ea;
+}
+:root[data-theme="dark"]{
+  --bg:#0e1016; --panel:#171a23; --panel-2:#1c1f2b; --ink:#e8eaf1; --ink-soft:#9aa0b2;
+  --line:#262a38; --line-strong:#333849; --accent:#7089f7; --accent-soft:#20263c;
+  --p1:#ff85a8; --p1-bg:#2c1721; --p2:#ffb454; --p2-bg:#2c2213; --p3:#8ea0f0; --p3-bg:#1a1f34; --ok:#69db7c; --ok-bg:#15251a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--mono);font-size:.86em}
+
+/* шапка */
+.masthead{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:6px}
+.masthead h1{font-size:22px;font-weight:680;letter-spacing:-.01em;margin:0}
+.masthead .run{font-family:var(--mono);color:var(--accent);font-size:15px}
+.sub{color:var(--ink-soft);font-size:13px;margin-bottom:22px}
+.actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.navbtn{border:1px solid var(--line-strong);background:var(--panel);color:var(--ink-soft);
+  border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.navbtn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0 0 12px;font-weight:650}
+
+/* таблица */
+.tblwrap{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-soft);font-weight:650;padding:9px 12px;background:var(--panel-2);border-bottom:1px solid var(--line)}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+/* длинные slug/URL переносятся, а не прокручиваются */
+td.slug code,.pg-url{word-break:break-all}
+.pg-url{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+td.ctr{white-space:nowrap;text-align:center;width:1%}
+.rowoff{opacity:.5}
+.state{color:var(--ink-soft);padding:40px 0;text-align:center}
+.err{color:var(--p1)}
+
+.sethead{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+.sethead h2{margin:0}
+.sethead .cnt{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.pg-type{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent);text-transform:uppercase;letter-spacing:.02em}
+
+/* редактируемые ячейки */
+.cell-in,.cell-sel{width:100%;background:transparent;border:1px solid transparent;border-radius:6px;
+  padding:5px 7px;color:var(--ink);font:inherit;font-size:12.5px}
+.cell-in{min-width:96px}
+.cell-in::placeholder{color:var(--ink-soft)}
+.cell-in:hover,.cell-sel:hover{border-color:var(--line-strong)}
+.cell-in:focus,.cell-sel:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.cell-sel{cursor:pointer}
+
+/* переключатель вкл/выкл */
+.sw{position:relative;display:inline-block;width:38px;height:22px;cursor:pointer}
+.sw input{opacity:0;width:0;height:0;position:absolute}
+.sw .track{position:absolute;inset:0;background:var(--line-strong);border-radius:11px;transition:background .15s}
+.sw .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.sw input:checked+.track{background:var(--ok)}
+.sw input:checked+.track+.knob{transform:translateX(16px)}
+
+.btn{border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);font:inherit;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-del{border:0;background:transparent;color:var(--p1);cursor:pointer;width:28px;height:28px;
+  border-radius:7px;font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.btn-del:hover{background:var(--p1-bg)}
+
+/* добавление по ссылкам */
+.add{margin-top:16px}
+.add label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:650;margin-bottom:6px}
+.add textarea{width:100%;min-height:80px;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;color:var(--ink);font-family:var(--mono);font-size:12px;resize:vertical}
+.add .row{display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+.hintline{font-size:12px;color:var(--ink-soft)}
+
+.warn{background:var(--p2-bg);border:1px solid var(--line);border-left:3px solid var(--p2);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--ink);margin-top:16px}
+.export{margin-top:14px}
+.export textarea{width:100%;min-height:150px;background:var(--panel-2);border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:var(--mono);font-size:12px;resize:vertical}
+.export .bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.export .bar .dirty{font-size:12px;color:var(--p2);font-weight:650}
+.copied{color:var(--ok);font-weight:650;font-size:12px}
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <h1>SEO-аудит aviasales.ru</h1>
+    <span class="run">настройки</span>
+    <div class="actions">
+      <a class="navbtn" href="index.html">← К дашборду</a>
+      <button class="navbtn" id="themebtn" type="button">Тема</button>
+    </div>
+  </div>
+  <div class="sub">Список страниц, которые проверяет аудит. Правки применяются вставкой JSON в <code>config/pages.json</code>.</div>
+
+  <div class="card" id="settings">
+    <div class="sethead">
+      <h2>Страницы проверок</h2>
+      <span class="cnt" id="pgcnt"></span>
+    </div>
+    <div id="pgstate" class="state">Загрузка списка страниц…</div>
+
+    <div id="pgbody" hidden>
+      <div class="tblwrap">
+        <table>
+          <thead><tr>
+            <th>Название</th><th>Slug</th><th>URL</th><th style="width:120px">Тип</th>
+            <th class="ctr">В прогоне</th><th class="ctr"></th>
+          </tr></thead>
+          <tbody id="pgtbody"></tbody>
+        </table>
+      </div>
+
+      <div class="add">
+        <label for="f-urls">Добавить страницы — один или несколько URL, каждый с новой строки</label>
+        <textarea id="f-urls" spellcheck="false" placeholder="https://www.aviasales.ru/countries/ispaniya&#10;https://www.aviasales.ru/cities/sochi-aer&#10;https://www.aviasales.ru/routes/led/mow"></textarea>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="addbtn">Добавить</button>
+          <span class="hintline" id="addhint">Тип и slug определятся по URL. Название задайте в таблице — иначе в отчёте покажется slug.</span>
+        </div>
+      </div>
+
+      <div class="warn">
+        <b>Как применить изменения.</b> Страница ничего не пишет на диск — она статическая.
+        Скопируйте JSON ниже в <code>config/pages.json</code> и закоммитьте.
+        <br>• <b>Отключить</b> страницу (переключатель «В прогоне») безопаснее, чем удалять:
+        история находок по ней сохраняется.
+        <br>• <b>Slug</b> меняется автоматически по URL — переименование обнуляет историю находок по странице.
+        <br>• Для <b>новой</b> страницы после коммита нужен сбор: <code>node lib/collect.mjs --slug &lt;slug&gt;</code> (или полный <code>npm run audit</code>).
+      </div>
+
+      <div class="export">
+        <div class="bar">
+          <button class="btn" type="button" id="pgcopy">Скопировать JSON</button>
+          <span class="dirty" id="pgdirty" hidden>● есть несохранённые изменения</span>
+          <span class="copied" id="pgcopied" hidden>Скопировано</span>
+        </div>
+        <textarea id="pgjson" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const rootEl=document.documentElement;
+document.getElementById('themebtn').addEventListener('click',()=>{
+  const cur=rootEl.getAttribute('data-theme')
+    || (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  rootEl.setAttribute('data-theme',cur==='dark'?'light':'dark');
+});
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const PAGE_TYPES=['country','city','route','airport'];
+let pgComment=null;   // сохраняем _comment из исходного файла
+let pgOriginal='';    // JSON исходного списка — для индикатора изменений
+let pgList=[];        // текущее состояние
+let pgTypes=PAGE_TYPES.slice();
+
+// slug по правилам репозитория: путь URL, сегменты через дефис, без домена и query
+function slugFromUrl(url){
+  try{ return new URL(url).pathname.replace(/^\/+|\/+$/g,'').replace(/\/+/g,'-').toLowerCase(); }
+  catch{ return ''; }
+}
+// тип по первому сегменту пути
+function typeFromUrl(url){
+  try{
+    const seg=new URL(url).pathname.split('/').filter(Boolean)[0];
+    return {countries:'country',cities:'city',routes:'route',airports:'airport'}[seg]||'country';
+  }catch{ return 'country'; }
+}
+// порядок полей в экспорте — как в pages.json; keywords не задаём (пайплайн выводит из URL)
+function pageOut(p){
+  const o={slug:p.slug,url:p.url,type:p.type,label:p.label||'',enabled:p.enabled!==false};
+  if(Array.isArray(p.keywords)&&p.keywords.length) o.keywords=p.keywords;
+  return o;
+}
+function pgExportObj(){
+  const obj={};
+  if(pgComment) obj._comment=pgComment;
+  obj.pages=pgList.map(pageOut);
+  return obj;
+}
+
+async function loadPages(){
+  let data;
+  try{
+    const res=await fetch('../config/pages.json',{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    data=await res.json();
+  }catch(e){
+    $('pgstate').innerHTML='<span class="err">Не удалось загрузить <code>../config/pages.json</code>: '+esc(e.message)+
+      '.</span> При открытии через <code>file://</code> нужен статический сервер из корня репозитория.';
+    return;
+  }
+  pgComment=data._comment||null;
+  pgList=(data.pages||[]).map(p=>({...p,enabled:p.enabled!==false,
+    keywords:Array.isArray(p.keywords)?p.keywords.slice():undefined}));
+  pgOriginal=JSON.stringify(pgExportObj());
+  pgTypes=[...new Set([...PAGE_TYPES,...pgList.map(p=>p.type)])];
+  $('pgstate').hidden=true;
+  $('pgbody').hidden=false;
+  renderPages();
+}
+
+function typeOptions(sel){
+  return pgTypes.map(t=>'<option value="'+esc(t)+'"'+(t===sel?' selected':'')+'>'+esc(t)+'</option>').join('');
+}
+
+function renderPages(){
+  const on=pgList.filter(p=>p.enabled).length;
+  $('pgcnt').textContent=pgList.length+' страниц · '+on+' в прогоне';
+  $('pgtbody').innerHTML=pgList.map((p,i)=>
+    '<tr class="'+(p.enabled?'':'rowoff')+'">'+
+    '<td><input class="cell-in" data-lab="'+i+'" value="'+esc(p.label||'')+'" placeholder="— задайте название"></td>'+
+    '<td class="slug"><code>'+esc(p.slug)+'</code></td>'+
+    '<td><div class="pg-url" title="'+esc(p.url)+'">'+esc(p.url)+'</div></td>'+
+    '<td><select class="cell-sel" data-typ="'+i+'">'+typeOptions(p.type)+'</select></td>'+
+    '<td class="ctr"><label class="sw"><input type="checkbox" data-tgl="'+i+'"'+(p.enabled?' checked':'')+'>'+
+      '<span class="track"></span><span class="knob"></span></label></td>'+
+    '<td class="ctr"><button class="btn-del" type="button" data-del="'+i+'" title="Удалить страницу" aria-label="Удалить страницу">✕</button></td>'+
+    '</tr>'
+  ).join('');
+  syncExport();
+}
+
+function syncExport(){
+  const cur=pgExportObj();
+  $('pgjson').value=JSON.stringify(cur,null,2)+'\n';
+  $('pgdirty').hidden=(JSON.stringify(cur)===pgOriginal);
+}
+
+// inline-правки: название и тип обновляют модель без перерисовки (чтобы не терять фокус)
+$('pgtbody').addEventListener('input',e=>{
+  const lab=e.target.closest('[data-lab]');
+  if(lab){ pgList[+lab.dataset.lab].label=lab.value; syncExport(); }
+});
+$('pgtbody').addEventListener('change',e=>{
+  const typ=e.target.closest('[data-typ]');
+  if(typ){ pgList[+typ.dataset.typ].type=typ.value; syncExport(); return; }
+  const tgl=e.target.closest('[data-tgl]');
+  if(tgl){ pgList[+tgl.dataset.tgl].enabled=tgl.checked; renderPages(); }
+});
+$('pgtbody').addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]');
+  if(del){
+    const i=+del.dataset.del, p=pgList[i];
+    if(confirm('Удалить страницу «'+(p.label||p.slug)+'» из списка?\n\nЭто уберёт её из pages.json. Чтобы лишь временно исключить из прогона — используйте переключатель «В прогоне», он сохраняет историю находок.')){
+      pgList.splice(i,1); renderPages();
+    }
+  }
+});
+
+// добавление по ссылкам (одна или несколько строк)
+$('addbtn').addEventListener('click',()=>{
+  const lines=$('f-urls').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const h=$('addhint');
+  if(!lines.length){ h.innerHTML='<span class="err">Вставьте хотя бы один URL.</span>'; return; }
+  let added=0; const skipped=[];
+  for(const url of lines){
+    const slug=slugFromUrl(url);
+    if(!slug){ skipped.push(esc(url)+' — не URL'); continue; }
+    if(pgList.some(p=>p.slug===slug)){ skipped.push('<code>'+esc(slug)+'</code> — уже в списке'); continue; }
+    const type=typeFromUrl(url);
+    if(!pgTypes.includes(type)) pgTypes.push(type);
+    pgList.push({slug,url,type,label:'',enabled:true});
+    added++;
+  }
+  h.innerHTML='Добавлено: <b>'+added+'</b>'+(skipped.length?'. Пропущено '+skipped.length+': '+skipped.join('; '):'')+
+    (added?'. Задайте названия в таблице и скопируйте JSON. Новые страницы соберутся при <code>npm run audit</code>.':'');
+  if(added){ $('f-urls').value=''; renderPages(); }
+});
+
+// копирование JSON
+$('pgcopy').addEventListener('click',async()=>{
+  const ta=$('pgjson');
+  try{ await navigator.clipboard.writeText(ta.value); }
+  catch{ ta.select(); document.execCommand('copy'); }
+  const ok=$('pgcopied'); ok.hidden=false; setTimeout(()=>ok.hidden=true,1600);
+});
+
+loadPages();
+</script>
