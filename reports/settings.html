@@ -211,7 +211,7 @@ function pgExportObj(){
 async function loadPages(){
   let data;
   try{
-    const res=await fetch('../config/pages.json');
+    const res=await fetch('../config/pages.json',{cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     data=await res.json();
   }catch(e){

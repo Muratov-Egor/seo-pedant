@@ -178,7 +178,7 @@ function cmpRun(a,b){
 async function load(){
   let text;
   try{
-    const res=await fetch('../data/history.ndjson');
+    const res=await fetch('../data/history.ndjson',{cache:'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     text=await res.text();
   }catch(e){
@@ -366,7 +366,7 @@ async function probeReports(){
   for(const cell of document.querySelectorAll('#tbody .rep')){
     for(const a of [...cell.querySelectorAll('a')]){
       let ok=false;
-      try{ ok=(await fetch(a.getAttribute('href'),{method:'HEAD'})).ok; }catch{}
+      try{ ok=(await fetch(a.getAttribute('href'),{method:'HEAD',cache:'no-store'})).ok; }catch{}
       if(!ok) a.remove();
     }
     if(!cell.querySelector('a')) cell.innerHTML='<span class="muted">—</span>';
