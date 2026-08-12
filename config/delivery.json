@@ -10,5 +10,6 @@
   "workspace": "Aviasales",
   "repo": "https://github.com/Muratov-Egor/seo-pedant",
   "branch": "master",
+  "pages_url": "https://muratov-egor.github.io/seo-pedant",
   "slack_max_chars": 3500
 }

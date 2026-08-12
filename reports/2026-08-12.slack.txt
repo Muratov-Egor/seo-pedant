@@ -22,4 +22,4 @@
 
 _Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
 
-Полный отчёт: https://github.com/Muratov-Egor/seo-pedant/blob/master/reports/2026-08-12.md
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-12.html
