@@ -4,24 +4,11 @@
     "thread_ts — метка последнего отправленного отчёта: следующий прогон читает",
     "по ней ответы владельца в треде и учитывает их."
   ],
-  "last_run": "2026-08-07-2",
+  "last_run": null,
   "channel_id": "C08664V7RUH",
-  "thread_ts": "1786089314.766339",
-  "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786089314766339",
+  "thread_ts": null,
+  "message_link": null,
   "sent_as": "пользователь через Slack MCP (Slack App с bot-токеном пока не создан)",
   "feedback_checked": true,
-  "previous": [
-    {
-      "run": "2026-08-07",
-      "thread_ts": "1785932261.716059"
-    },
-    {
-      "run": "2026-08-05-3",
-      "thread_ts": "1785932261.716059"
-    },
-    {
-      "run": "2026-08-05-2",
-      "thread_ts": "1785930326.235309"
-    }
-  ]
+  "previous": []
 }

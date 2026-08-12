@@ -16,7 +16,7 @@
     "Снять лимит: development.enabled = false."
   ],
   "development": {
-    "enabled": true,
+    "enabled": false,
     "internal_links_per_page": 10
   }
 }
