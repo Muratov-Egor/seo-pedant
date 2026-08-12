@@ -88,8 +88,9 @@ td.ctr{white-space:nowrap;text-align:center;width:1%}
 .btn{border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);font:inherit;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer}
 .btn:hover{border-color:var(--accent)}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn-ghost{border-color:transparent;color:var(--p1);padding:5px 9px}
-.btn-ghost:hover{background:var(--p1-bg);border-color:transparent}
+.btn-del{border:0;background:transparent;color:var(--p1);cursor:pointer;width:28px;height:28px;
+  border-radius:7px;font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.btn-del:hover{background:var(--p1-bg)}
 
 /* добавление по ссылкам */
 .add{margin-top:16px}
@@ -136,7 +137,7 @@ td.ctr{white-space:nowrap;text-align:center;width:1%}
       </div>
 
       <div class="add">
-        <label for="f-urls">Добавить страницы — по одному URL в строке</label>
+        <label for="f-urls">Добавить страницы — один или несколько URL, каждый с новой строки</label>
         <textarea id="f-urls" spellcheck="false" placeholder="https://www.aviasales.ru/countries/ispaniya&#10;https://www.aviasales.ru/cities/sochi-aer&#10;https://www.aviasales.ru/routes/led/mow"></textarea>
         <div class="row">
           <button class="btn btn-primary" type="button" id="addbtn">Добавить</button>
@@ -243,7 +244,7 @@ function renderPages(){
     '<td><select class="cell-sel" data-typ="'+i+'">'+typeOptions(p.type)+'</select></td>'+
     '<td class="ctr"><label class="sw"><input type="checkbox" data-tgl="'+i+'"'+(p.enabled?' checked':'')+'>'+
       '<span class="track"></span><span class="knob"></span></label></td>'+
-    '<td class="ctr"><button class="btn-ghost" type="button" data-del="'+i+'">Удалить</button></td>'+
+    '<td class="ctr"><button class="btn-del" type="button" data-del="'+i+'" title="Удалить страницу" aria-label="Удалить страницу">✕</button></td>'+
     '</tr>'
   ).join('');
   syncExport();
