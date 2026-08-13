@@ -1,0 +1,32 @@
+*SEO Pedant · прогон 2026-08-13*
+10 стр. · находок 714 (P1 490 · P2 173 · P3 51)
+:new: новых 3 · :white_check_mark: устранено 7 · прошлый прогон 2026-08-12-2: 718
+
+*Требует решения*
+• :new:1 P1 Внутренние ссылки: 486 — 6 стр.
+• :repeat: P1 Canonical указывает на саму страницу, без параметров: 3 — airports-zhukovsky-international-airport-zia, cities-batumi-bus, routes-nqz-ala
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :repeat: P2 Внешние ссылки: 167 — все страницы
+• :repeat: P2 Title страницы: 3 — cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+• :new: P2 Внутренние ссылки: 2 — cities-moskva-mow, countries-tailand
+• :repeat: P2 SSR — контент доступен сразу в HTML: 1 — cities-batumi-bus
+
+*Не требует решения сейчас*
+• P3 Нет ошибок в консоли: 32 (10 стр.)
+• P3 Внешние ссылки: 10 (10 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 Внутренние ссылки: 3 (3 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
+
+*Устранено*
+• :white_check_mark: cities-batumi-bus: длина
+• :white_check_mark: cities-moskva-mow: битая: https://www.aviasales.ru/airlines/nouvelair?language=ru
+• :white_check_mark: cities-moskva-mow: битая: https://www.aviasales.ru/airlines/tap-portugal?language=ru
+• :white_check_mark: countries-gruziya: битая: https://www.aviasales.ru/routes/mow/ge
+• :white_check_mark: countries-gruziya: битая: https://www.aviasales.ru/search/KZN0710BUS1?t=N417913567001791405000000745KZNAERBUS_da928efefc145d12901444d2d58e…
+• :white_check_mark: countries-turtsiya: битая: https://www.aviasales.ru/routes/led/tr
+• :white_check_mark: airports-zhukovsky-international-airport-zia: robots.txt
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-13.html
