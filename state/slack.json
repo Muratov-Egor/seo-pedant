@@ -4,13 +4,18 @@
     "thread_ts — метка последнего отправленного отчёта: следующий прогон читает",
     "по ней ответы владельца в треде и учитывает их."
   ],
-  "last_run": "2026-08-15",
+  "last_run": "2026-08-16",
   "channel_id": "C08664V7RUH",
-  "thread_ts": "1786789825.734459",
-  "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786789825734459",
+  "thread_ts": "1786891552.578849",
+  "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786891552578849",
   "sent_as": "пользователь через Slack MCP (Slack App с bot-токеном пока не создан)",
   "feedback_checked": true,
   "previous": [
+    {
+      "last_run": "2026-08-15",
+      "thread_ts": "1786789825.734459",
+      "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786789825734459"
+    },
     {
       "last_run": "2026-08-14",
       "thread_ts": "1786697839.288369",
@@ -25,11 +30,6 @@
       "last_run": "2026-08-12-2",
       "thread_ts": "1786537875.344399",
       "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786537875344399"
-    },
-    {
-      "last_run": "2026-08-12",
-      "thread_ts": "1786534999.316719",
-      "message_link": "https://aviasales.slack.com/archives/C08664V7RUH/p1786534999316719"
     }
   ]
 }
