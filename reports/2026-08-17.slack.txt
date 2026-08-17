@@ -1,0 +1,31 @@
+*SEO Pedant · прогон 2026-08-17*
+10 стр. · находок 720 (P1 489 · P2 180 · P3 51)
+:new: новых 7 · :white_check_mark: устранено 8 · прошлый прогон 2026-08-16: 497
+
+*Требует решения*
+• :repeat: P1 Внутренние ссылки: 488 — 6 стр.
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :repeat: P2 Внешние ссылки: 167 — все страницы
+• :new:7 P2 Внутренние ссылки: 9 — 7 стр.
+• :repeat: P2 Title страницы: 4 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+
+*Не требует решения сейчас*
+• P3 Нет ошибок в консоли: 32 (10 стр.)
+• P3 Внешние ссылки: 10 (10 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 Внутренние ссылки: 3 (3 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
+
+*Устранено*
+• :white_check_mark: airports-zhukovsky-international-airport-zia: внутренние ссылки без ответа на проверку
+• :white_check_mark: cities-batumi-bus: внутренние ссылки без ответа на проверку
+• :white_check_mark: cities-moskva-mow: внутренние ссылки без ответа на проверку
+• :white_check_mark: countries-belarus: внутренние ссылки без ответа на проверку
+• :white_check_mark: countries-chernogoriya: внутренние ссылки без ответа на проверку
+• :white_check_mark: countries-gruziya: внутренние ссылки без ответа на проверку
+• :white_check_mark: countries-turtsiya: внутренние ссылки без ответа на проверку
+• :white_check_mark: routes-mow-aer: внутренние ссылки без ответа на проверку
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-17.html
