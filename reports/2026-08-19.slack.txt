@@ -1,0 +1,30 @@
+*SEO Pedant · прогон 2026-08-19*
+10 стр. · находок 501 (P1 268 · P2 172 · P3 61)
+:new: новых 3 · :white_check_mark: устранено 289 · прошлый прогон 2026-08-18: 745
+
+*Требует решения*
+• :new:3 P1 Внутренние ссылки: 267 — 5 стр.
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :repeat: P2 Внешние ссылки: 168 — все страницы
+• :repeat: P2 Title страницы: 4 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+
+*Не требует решения сейчас*
+• P3 Нет ошибок в консоли: 34 (10 стр.)
+• P3 Внутренние ссылки: 11 (9 стр.)
+• P3 Внешние ссылки: 10 (10 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
+
+*Устранено*
+• :white_check_mark: cities-batumi-bus: битая: https://www.aviasales.ge/cities/aer?language=en
+• :white_check_mark: cities-batumi-bus: битая: https://www.aviasales.ge/cities/aji?language=en
+• :white_check_mark: cities-batumi-bus: битая: https://www.aviasales.ge/cities/nal?language=en
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/%D0%B2%D0%B3?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/2s?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/3f?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/5n?language=ru
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/6r?language=ru
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-19.html
