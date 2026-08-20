@@ -1,0 +1,31 @@
+*SEO Pedant · прогон 2026-08-20*
+10 стр. · находок 717 (P1 490 · P2 174 · P3 53)
+:new: новых 1 · :white_check_mark: устранено 12 · прошлый прогон 2026-08-19: 501
+
+*Требует решения*
+• :new:1 P1 Внутренние ссылки: 489 — 6 стр.
+• :repeat: P1 Код ответа сервера: 1 — countries-tailand
+• :repeat: P2 Внешние ссылки: 169 — все страницы
+• :repeat: P2 Title страницы: 4 — cities-batumi-bus, cities-moskva-mow, routes-mow-aer, routes-nqz-ala
+• :repeat: P2 Внутренние ссылки: 1 — countries-tailand
+
+*Не требует решения сейчас*
+• P3 Нет ошибок в консоли: 34 (10 стр.)
+• P3 Внешние ссылки: 10 (10 стр.)
+• P3 Ключевые слова встречаются в тексте и alt-тегах: 5 (5 стр.)
+• P3 Внутренние ссылки: 3 (3 стр.)
+• P3 robots.txt не запрещает путь или URL страницы: 1 (1 стр.)
+
+*Устранено*
+• :white_check_mark: countries-belarus: битая: https://www.aviasales.ru/airlines/z0?language=ru
+• :white_check_mark: countries-gruziya: битая: https://www.aviasales.ru/airlines/zh?language=ru
+• :white_check_mark: countries-tailand: битая: https://www.aviasales.ru/airlines/b6?language=ru
+• :white_check_mark: countries-tailand: битая: https://www.aviasales.ru/airlines/oq?language=ru
+• :white_check_mark: airports-zhukovsky-international-airport-zia: внутренние ссылки без ответа на проверку
+• :white_check_mark: cities-batumi-bus: внутренние ссылки без ответа на проверку
+• :white_check_mark: cities-moskva-mow: внутренние ссылки без ответа на проверку
+• :white_check_mark: countries-belarus: внутренние ссылки без ответа на проверку
+
+_Не проверялось: Контент уникален и релевантен странице (text-uniqueness-external); Перформанс страницы (Lighthouse)_
+
+Отчёт: https://muratov-egor.github.io/seo-pedant/reports/2026-08-20.html
